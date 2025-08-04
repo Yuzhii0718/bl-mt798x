@@ -1,0 +1,1 @@
+gcc-aarch64-linux-gnu build-essential flex bison libssl-dev device-tree-compiler qemu-user-static python2.7
