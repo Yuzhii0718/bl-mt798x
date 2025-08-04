@@ -31,3 +31,4 @@ u-boot.cfg
 /mkgpt/gpttable
 __pycache__
 output/*
+output_gpt/*

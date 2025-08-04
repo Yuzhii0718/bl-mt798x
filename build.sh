@@ -1,19 +1,27 @@
 #!/bin/sh
 
 TOOLCHAIN=aarch64-linux-gnu-
-#UBOOT_DIR=uboot-mtk-20220606
-UBOOT_DIR=uboot-mtk-20230718-09eda825
-#ATF_DIR=atf-20220606-637ba581b
-ATF_DIR=atf-20231013-0ea67d76a
+
+if [ "$VERSION" = "2023" ]; then
+    UBOOT_DIR=uboot-mtk-20230718-09eda825
+    ATF_DIR=atf-20231013-0ea67d76a
+elif [ "$VERSION" = "2022" ]; then
+    UBOOT_DIR=uboot-mtk-20220606
+    ATF_DIR=atf-20220606-637ba581b
+else
+    echo "Error: Unsupported VERSION. Please specify VERSION=2022 or VERSION=2023."
+    exit 1
+fi
 
 if [ -z "$SOC" ] || [ -z "$BOARD" ]; then
-	echo "Usage: SOC=[mt7981|mt7986] BOARD=<board name> MULTI_LAYOUT=[0|1] $0"
-	echo "eg: SOC=mt7981 BOARD=360t7 $0"
-	echo "eg: SOC=mt7981 BOARD=wr30u MULTI_LAYOUT=1 $0"
-	echo "eg: SOC=mt7981 BOARD=cmcc_rax3000m-emmc $0"
-	echo "eg: SOC=mt7986 BOARD=redmi_ax6000 MULTI_LAYOUT=1 $0"
-	echo "eg: SOC=mt7986 BOARD=jdcloud_re-cp-03 $0"
-	exit 1
+    echo "Usage: SOC=[mt7981|mt7986] BOARD=<board name> VERSION=[2022|2023] $0"
+    echo "eg: SOC=mt7981 BOARD=360t7 VERSION=2022 $0"
+    echo "eg: SOC=mt7981 BOARD=wr30u VERSION=2022 $0"
+    echo "eg: SOC=mt7981 BOARD=cmcc_rax3000m-emmc VERSION=2022 $0"
+    echo "eg: SOC=mt7981 BOARD=philips_hy3000 VERSION=2022 $0"
+    echo "eg: SOC=mt7986 BOARD=redmi_ax6000 VERSION=2022 $0"
+    echo "eg: SOC=mt7986 BOARD=jdcloud_re-cp-03 VERSION=2022 $0"
+    exit 1
 fi
 
 # Check if Python is installed on the system
@@ -25,8 +33,13 @@ command -v "${TOOLCHAIN}gcc"
 [ "$?" != "0" ] && { echo "${TOOLCHAIN}gcc not found!"; exit 0; }
 export CROSS_COMPILE="$TOOLCHAIN"
 
-ATF_CFG="${SOC}_${BOARD}_defconfig"
-UBOOT_CFG="${SOC}_${BOARD}_defconfig"
+ATF_CFG_SOURCE="${SOC}_${BOARD}_defconfig"
+UBOOT_CFG_SOURCE="${SOC}_${BOARD}_defconfig"
+
+# 为 sources的配置文件做备份
+ATF_CFG="${ATF_CFG:-$ATF_CFG_SOURCE}"
+UBOOT_CFG="${UBOOT_CFG:-$UBOOT_CFG_SOURCE}"
+
 for file in "$ATF_DIR/configs/$ATF_CFG" "$UBOOT_DIR/configs/$UBOOT_CFG"; do
 	if [ ! -f "$file" ]; then
 		echo "$file not found!"
@@ -76,7 +89,7 @@ make -C "$ATF_DIR" -f makefile all CONFIG_CROSS_COMPILER="${TOOLCHAIN}"
 
 mkdir -p "output"
 if [ -f "$ATF_DIR/build/${SOC}/release/fip.bin" ]; then
-	FIP_NAME="${SOC}_${BOARD}-fip"
+	FIP_NAME="${SOC}_${BOARD}_${VERSION}-fip"
 	if [ "$fixedparts" = "1" ]; then
 		FIP_NAME="${FIP_NAME}-fixed-parts"
 	fi
@@ -91,11 +104,12 @@ else
 fi
 if grep -q "CONFIG_TARGET_ALL_NO_SEC_BOOT=y" "$ATF_DIR/configs/$ATF_CFG"; then
 	if [ -f "$ATF_DIR/build/${SOC}/release/bl2.img" ]; then
-		BL2_NAME="${SOC}_${BOARD}-bl2"
+		BL2_NAME="${SOC}_${BOARD}_${VERSION}-bl2"
 		cp -f "$ATF_DIR/build/${SOC}/release/bl2.img" "output/${BL2_NAME}.bin"
 		echo "$BL2_NAME build done"
 	else
 		echo "bl2 build fail!"
 		exit 1
 	fi
+	build_bl2
 fi
