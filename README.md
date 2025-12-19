@@ -12,14 +12,38 @@ sudo apt install gcc-aarch64-linux-gnu build-essential flex bison libssl-dev dev
 ```
 
 ## Build
+
+```bash
+chmod +x build.sh
+SOC=mt7981 BOARD=360t7 VERSION=2022 ./build.sh
 ```
-Usage: SOC=[mt7981|mt7986] BOARD=<board name> MULTI_LAYOUT=[0|1] ./build.sh
-eg: SOC=mt7981 BOARD=360t7 ./build.sh
-eg: SOC=mt7981 BOARD=wr30u MULTI_LAYOUT=1 ./build.sh
-eg: SOC=mt7981 BOARD=cmcc_rax3000m-emmc ./build.sh
-eg: SOC=mt7986 BOARD=redmi_ax6000 MULTI_LAYOUT=1 ./build.sh
-eg: SOC=mt7986 BOARD=jdcloud_re-cp-03 ./build.sh
+> SOC=mt7981/mt7986
+> VERSION=2022/2023/2024/2025
+
+> The diffence of every version
+
+| Version | ATF | UBOOT |
+| --- | --- | --- |
+| 2022 | 20220606-637ba581b | 20220606 |
+| 2023 | 20231013-0ea67d76a | 20230718-09eda825 |
+| 2024 | 20240117-bacca82a8 | 20230718-09eda825 |
+| 2025 | 20250711 | 20250711 |
+
+Generate file will be in `output`
+
+## Generate GPT with python2.7
+
+```bash
+chmod +x generate_gpt.sh
+./generate_gpt.sh
 ```
+
+Generate file will be in `output_gpt`
+
+## Use Action to build
+
+- [x] Build FIP
+- [ ] Build GPT (Optional)
 
 ---
 

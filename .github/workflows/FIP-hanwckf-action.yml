@@ -1,0 +1,231 @@
+#
+# Copyright (c) 2019-2020 P3TERX <https://p3terx.com>
+#
+# This is free software, licensed under the MIT License.
+# See /LICENSE for more information.
+#
+###############手动修改##############
+name: FIP-hanwckf-action
+
+on:
+  repository_dispatch:
+  workflow_dispatch:
+    inputs:
+      MODEL:
+        description: 'Model selection'
+        required: true
+        default: 'philips_hy3000'
+        type: string
+      FIP_VERSION: 
+        description: 'FIP versions (comma-separated, e.g., 2022,2023,2024,2025)'
+        required: true
+        default: '2024'
+        type: string
+      REPO_URL:
+        description: 'Source repository'
+        required: true
+        default: 'https://github.com/Yuzhii0718/bl-mt798x'
+        type: string
+      REPO_BRANCH:
+        description: 'Repository branch'
+        required: true
+        default: 'master'
+        type: string
+      GPT_GEN:
+        description: 'Generate GPT table image'
+        required: true
+        default: false
+        type: boolean
+      ssh:
+        description: 'SSH connection to Actions'
+        required: false
+        default: 'false'
+#  schedule:
+#    - cron: 0 16 * * *
+
+env:
+  ###############手动修改##############
+  UPLOAD_TAG_NAME: ${{ github.event.inputs.MODEL }}
+  REPO_URL: ${{ github.event.inputs.REPO_URL }}
+  REPO_BRANCH: ${{ github.event.inputs.REPO_BRANCH }}
+  SSH_ACTIONS: false
+  UPLOAD_FIRMWARE: true
+  UPLOAD_RELEASE: true
+  TZ: Asia/Shanghai
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+          matrix:
+            os:
+              - ubuntu-22.04
+
+    permissions:
+      contents: write
+
+    steps:
+    - name: 检查项目分支
+      uses: actions/checkout@master
+
+    - name: 初始化编译环境
+      env:
+        DEBIAN_FRONTEND: noninteractive
+      run: |
+        sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
+        sudo -E apt-get -qq update
+        sudo -E apt-get -qq install $(cat $GITHUB_WORKSPACE/depends/${{ matrix.os }})
+        sudo -E apt-get -qq install rename
+        sudo -E apt-get -qq autoremove --purge
+        sudo -E apt-get -qq clean
+        sudo timedatectl set-timezone "$TZ"
+        sudo mkdir -p /workdir
+        sudo chown $USER:$GROUPS /workdir
+
+    - name: 清理磁盘空间(Ubuntu)
+      uses: jlumbroso/free-disk-space@main
+      with:
+        # this might remove tools that are actually needed,
+        # when set to "true" but frees about 6 GB
+        tool-cache: true
+        
+        # all of these default to true, but feel free to set to
+        # "false" if necessary for your workflow
+        android: false
+        dotnet: false
+        haskell: false
+        large-packages: false
+        swap-storage: false
+
+    - name: 下载源码
+      working-directory: /workdir
+      run: |
+        df -hT $PWD
+        git clone $REPO_URL -b $REPO_BRANCH bl-mt798x
+        ln -sf /workdir/bl-mt798x $GITHUB_WORKSPACE/bl-mt798x
+
+    - name: SSH链接管理
+      uses: P3TERX/ssh2actions@v1.0.0
+      if: (github.event.inputs.ssh == 'true' && github.event.inputs.ssh  != 'false') || contains(github.event.action, 'ssh')
+      env:
+        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+
+    - name: 解析 FIP 版本输入
+      run: |
+        IFS=',' read -ra VERSIONS <<< "${{ github.event.inputs.FIP_VERSION }}"
+        echo "解析到的版本如下："
+        for version in "${VERSIONS[@]}"; do
+          echo "Processing version: $version"
+        done
+
+    - name: 编译 FIP
+      id: compile
+      run: |
+        cd bl-mt798x
+        chmod +x ./build.sh
+        
+        # 解析需要编译的版本列表
+        if [ "${{ github.event.inputs.FIP_VERSION }}" = "all" ]; then
+          SUPPORTED_VERSIONS=("2022" "2023" "2024" "2025")
+          echo "检测到 all，将编译：${SUPPORTED_VERSIONS[*]}"
+        else
+          IFS=',' read -ra SUPPORTED_VERSIONS <<< "${{ github.event.inputs.FIP_VERSION }}"
+          echo "将按选择编译：${SUPPORTED_VERSIONS[*]}"
+        fi
+
+        # 逐版本编译并缓存到各自临时目录
+        for version in "${SUPPORTED_VERSIONS[@]}"; do
+          echo "正在编译${version}版本FIP..."
+          SOC=mt7981 BOARD=${{ github.event.inputs.MODEL }} VERSION=${version} ./build.sh
+          mkdir -p "temp_output_${version}"
+          if [ -d "output" ]; then
+            cp -r output/* "temp_output_${version}/" || true
+            rm -rf output/*
+          fi
+        done
+
+        # 合并所有版本的输出到 output 目录
+        mkdir -p output
+        for version in "${SUPPORTED_VERSIONS[@]}"; do
+          cp -r "temp_output_${version}/"* output/ || true
+        done
+
+        # 清理临时目录
+        for version in "${SUPPORTED_VERSIONS[@]}"; do
+          rm -rf "temp_output_${version}"
+        done
+        
+        echo "FILE_DATE=$(date +"%Y.%m.%d-%H%M")" >> $GITHUB_ENV
+        echo "status=success" >> $GITHUB_OUTPUT
+    
+    - name: 编译 GPT
+      if: github.event.inputs.GPT_GEN == 'true' && !cancelled()
+      run: |
+        cd bl-mt798x
+        chmod +x ./generate_gpt.sh
+        ./generate_gpt.sh
+        echo "status=success" >> $GITHUB_OUTPUT
+        echo "GPT=1" >> $GITHUB_ENV
+
+    - name: 查看磁盘使用情况
+      if: (!cancelled())
+      run: df -hT
+
+    - name: 整理文件并重命名
+      id: organize
+      if: env.UPLOAD_FIRMWARE == 'true' && !cancelled()
+      run: | 
+        cd bl-mt798x
+        # 获取当前时间戳
+        TIMESTAMP=$(date +"%Y%m%d-%H%M%S")
+        # 重命名 output 目录下的文件
+        if [ -d "output" ]; then
+          rename "s/(.*)\.(.*)/\$1_${TIMESTAMP}.\$2/" output/*
+        fi
+        # 重命名 output_gpt 目录下的文件
+        if [ -d "output_gpt" ]; then
+          rename "s/(.*)\.(.*)/\$1_${TIMESTAMP}.\$2/" output_gpt/*
+        fi
+        # 移动文件到指定目录
+        mkdir -p upload
+        if [ -d "output" ]; then
+          mv output/* upload/
+        fi
+        if [ -d "output_gpt" ]; then
+          mv output_gpt/* upload/
+        fi
+        echo "FIRMWARE=$PWD" >> $GITHUB_ENV
+        echo "status=success" >> $GITHUB_OUTPUT
+
+    - name: 打包上传固件到Actions Artifacts
+      uses: actions/upload-artifact@main
+      if: steps.organize.outputs.status == 'success' && !cancelled()
+      with:
+        name: ${{ env.FILE_DATE }}-${{ env.UPLOAD_TAG_NAME }}
+        path: |
+          bl-mt798x/upload/*
+
+    - name: 生成固件Release标签
+      id: tag
+      if: env.UPLOAD_RELEASE == 'true' && !cancelled()
+      run: |
+        touch release.txt
+        echo "- 使用源码：${{ env.REPO_URL }}" >> release.txt
+        echo "- 使用分支：${{ env.REPO_BRANCH }}" >> release.txt
+        echo "- 使用版本：${{ github.event.inputs.FIP_VERSION }}" >> release.txt
+        echo "- 编译时间：${{ env.FILE_DATE }}" >> release.txt
+        echo "release_tag=${{ env.FILE_DATE }}-${{ env.UPLOAD_TAG_NAME }}" >> $GITHUB_OUTPUT
+        echo "status=success" >> $GITHUB_OUTPUT
+
+    - name: 发布固件至Release
+      uses: softprops/action-gh-release@v2.1.0
+      if: steps.tag.outputs.status == 'success' && !cancelled()
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        files: bl-mt798x/upload/*
+        release_name: ${{ env.FILE_DATE }}-${{ env.UPLOAD_TAG_NAME }}
+        name: ${{ env.FILE_DATE }}-${{ env.UPLOAD_TAG_NAME }}
+        tag_name: ${{ steps.tag.outputs.release_tag }}
+        body_path: release.txt
