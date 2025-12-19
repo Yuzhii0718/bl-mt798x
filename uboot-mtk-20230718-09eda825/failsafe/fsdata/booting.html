@@ -8,6 +8,9 @@
 		<script>
 			function init() {
 				getversion();
+				// Initial i18n texts
+				document.getElementById('title').textContent = t('booting.titleInProgress');
+				document.getElementById('info').innerHTML = t('booting.infoInProgress');
 
 				ajax({
 					url: '/result',
@@ -17,8 +20,8 @@
 							return
 						}
 
-						document.getElementById('title').innerHTML = 'BOOT SUCCESS'
-						document.getElementById('info').innerHTML = 'Your device was successfully booted into initramfs!'
+						document.getElementById('title').textContent = t('booting.titleDone');
+						document.getElementById('info').innerHTML = t('booting.infoDone');
 					},
 					timeout: 30000
 				})
@@ -26,14 +29,7 @@
 		</script>
 	</head>
 	<body onload="init()">
-		<div id="m">
-			<h1 id="title">BOOTING INITRAMFS</h1>
-			<p id="info">
-				Your file was successfully uploaded! Booting is in progress, please wait...<br>
-				This page may be in not responding status for a short time.
-			</p>
-			<div id="l"></div>
-		</div>
+		<div id="m"></div>
 		<div id="version"></div>
 	</body>
 </html>
