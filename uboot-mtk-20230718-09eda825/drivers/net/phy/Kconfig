@@ -80,6 +80,12 @@ config PHY_ADIN
 menuconfig PHY_AIROHA
 	bool "Airoha Ethernet PHYs support"
 
+config PHY_AIROHA_AN8801SB
+	bool "Airoha Ethernet AN8801SB support"
+	depends on PHY_AIROHA
+	help
+		AIROHA AN8801SB supported.
+
 config PHY_AIROHA_EN8801S
 	bool "Airoha Ethernet EN8801S support"
 	depends on PHY_AIROHA
