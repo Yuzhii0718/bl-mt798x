@@ -1,9 +1,11 @@
 # ATF and u-boot for mt798x
 
+A modified version of hanwckf's u-boot for mt798x by Yuzhii, with support for auto dhcp, and beautiful webui.
+
 ## About bl-mt798x
 - https://cmi.hanwckf.top/p/mt798x-uboot-usage
 
-![](/u-boot.gif)
+![webui](document/webui.png)
 
 ## Prepare
 
