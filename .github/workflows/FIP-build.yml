@@ -1,11 +1,8 @@
 #
-# Copyright (c) 2019-2020 P3TERX <https://p3terx.com>
-#
 # This is free software, licensed under the MIT License.
 # See /LICENSE for more information.
 #
-###############手动修改##############
-name: FIP-hanwckf-action
+name: FIP-build
 
 on:
   repository_dispatch:
@@ -14,7 +11,7 @@ on:
       MODEL:
         description: 'Model selection'
         required: true
-        default: 'philips_hy3000'
+        default: 'cmcc_a10'
         type: string
       FIP_VERSION: 
         description: 'FIP versions (comma-separated, e.g., 2022,2023,2024,2025)'
@@ -48,7 +45,6 @@ on:
 #    - cron: 0 16 * * *
 
 env:
-  ###############手动修改##############
   UPLOAD_TAG_NAME: ${{ github.event.inputs.MODEL }}
   REPO_URL: ${{ github.event.inputs.REPO_URL }}
   REPO_BRANCH: ${{ github.event.inputs.REPO_BRANCH }}
