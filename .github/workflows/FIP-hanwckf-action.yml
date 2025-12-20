@@ -40,6 +40,10 @@ on:
         description: 'SSH connection to Actions'
         required: false
         default: 'false'
+      save_disk:
+        description: 'Free up disk space before build (Ubuntu only)'
+        required: false
+        default: 'false'
 #  schedule:
 #    - cron: 0 16 * * *
 
@@ -83,6 +87,7 @@ jobs:
         sudo chown $USER:$GROUPS /workdir
 
     - name: 清理磁盘空间(Ubuntu)
+      if: github.event.inputs.save_disk == 'true' && !cancelled()
       uses: jlumbroso/free-disk-space@main
       with:
         # this might remove tools that are actually needed,
@@ -181,6 +186,9 @@ jobs:
         TIMESTAMP=$(date +"%Y%m%d-%H%M%S")
         # 重命名 output 目录下的文件
         if [ -d "output" ]; then
+          for file in output/*fip*.bin; do
+            mv "$file" "${file%.bin}-dhcp.bin"
+          done
           rename "s/(.*)\.(.*)/\$1_${TIMESTAMP}.\$2/" output/*
         fi
         # 重命名 output_gpt 目录下的文件
