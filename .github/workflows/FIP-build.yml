@@ -14,7 +14,7 @@ on:
         default: 'cmcc_a10'
         type: string
       FIP_VERSION: 
-        description: 'FIP versions (comma-separated, e.g., 2022,2023,2024,2025)'
+        description: 'FIP versions (comma-separated, e.g., 2022,2023,2024,all)'
         required: true
         default: '2024'
         type: string
@@ -30,7 +30,17 @@ on:
         type: string
       GPT_GEN:
         description: 'Generate GPT table image'
-        required: true
+        required: false
+        default: false
+        type: boolean
+      GEN_BL2:
+        description: 'Generate BL2 binary(v22/23 ATF only)'
+        required: false
+        default: false
+        type: boolean
+      OC_BL2:
+        description: 'Build 1.6GHz BL2 by patch'
+        required: false
         default: false
         type: boolean
       ssh:
@@ -38,7 +48,7 @@ on:
         required: false
         default: 'false'
       save_disk:
-        description: 'Free up disk space before build (Ubuntu only)'
+        description: 'Free up disk space(build environment)'
         required: false
         default: 'false'
 #  schedule:
@@ -52,6 +62,14 @@ env:
   UPLOAD_FIRMWARE: true
   UPLOAD_RELEASE: true
   TZ: Asia/Shanghai
+  # ATF and U-Boot versions mapping/path
+  atf22: atf-20220606-637ba581b
+  uboot22: uboot-mtk-20220606
+  atf23: atf-20231013-0ea67d76a
+  uboot23: uboot-mtk-20230718-09eda825
+  atf24: atf-20240117-bacca82a8
+  uboot25: uboot-mtk-20250711
+  atf25: atf-20250711
 
 jobs:
   build:
@@ -68,21 +86,33 @@ jobs:
     - name: 检查项目分支
       uses: actions/checkout@master
 
-    - name: 初始化编译环境
+    - name: 清理磁盘空间(local1)
+      if: github.event.inputs.save_disk == 'true' && !cancelled()
       env:
         DEBIAN_FRONTEND: noninteractive
       run: |
         sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
+
+    - name: 初始化编译环境
+      env:
+        DEBIAN_FRONTEND: noninteractive
+      run: |
         sudo -E apt-get -qq update
         sudo -E apt-get -qq install $(cat $GITHUB_WORKSPACE/depends/${{ matrix.os }})
         sudo -E apt-get -qq install rename
-        sudo -E apt-get -qq autoremove --purge
-        sudo -E apt-get -qq clean
         sudo timedatectl set-timezone "$TZ"
         sudo mkdir -p /workdir
         sudo chown $USER:$GROUPS /workdir
 
-    - name: 清理磁盘空间(Ubuntu)
+    - name: 清理磁盘空间(local2)
+      if: github.event.inputs.save_disk == 'true' && !cancelled()
+      env:
+        DEBIAN_FRONTEND: noninteractive
+      run: |
+        sudo -E apt-get -qq autoremove --purge
+        sudo -E apt-get -qq clean
+
+    - name: 清理磁盘空间(plugin)
       if: github.event.inputs.save_disk == 'true' && !cancelled()
       uses: jlumbroso/free-disk-space@main
       with:
@@ -120,6 +150,49 @@ jobs:
           echo "Processing version: $version"
         done
 
+    - name: ATF22/23 BL2 生成配置修正
+      if: github.event.inputs.GEN_BL2 == 'true' && !cancelled()
+      run: |
+        set -euo pipefail
+        cd bl-mt798x
+
+        MODEL="${{ github.event.inputs.MODEL }}"
+        DEFCONF="mt7981_${MODEL}_defconfig"
+
+        try_patch_defconfig() {
+          local path="$1"
+          if [ -f "$path" ]; then
+            if grep -q '^CONFIG_TARGET_FIP_NO_SEC_BOOT=y$' "$path"; then
+              sed -i 's/^CONFIG_TARGET_FIP_NO_SEC_BOOT=y$/CONFIG_TARGET_ALL_NO_SEC_BOOT=y/' "$path"
+              echo "Patched: $path"
+            else
+              echo "Skip (no target line): $path"
+            fi
+            return 0
+          fi
+          return 1
+        }
+
+        # 针对22、23 ATF版本修正defconfig
+        for atf_dir in "${{ env.atf22 }}" "${{ env.atf23 }}"; do
+          echo "Checking ATF dir: $atf_dir"
+          if try_patch_defconfig "${atf_dir}/configs/${DEFCONF}"; then
+            echo "Successfully patched defconfig file: ${atf_dir}/configs/${DEFCONF}"
+          else
+            echo "Warning: defconfig not found for $atf_dir (searched configs/, atf/configs/)"
+          fi
+        done
+        echo "status=success" >> $GITHUB_OUTPUT
+        echo "GEN_BL2=1" >> $GITHUB_ENV
+
+    - name: 应用 BL2 超频补丁
+      if: github.event.inputs.OC_BL2 == 'true' && !cancelled()
+      run: |
+        cd bl-mt798x
+        git apply overclocking-patch/0001-overclocking-mt7981-to-1.6GHz-by-modify-atf.patch
+        echo "status=success" >> $GITHUB_OUTPUT
+        echo "OC_BL2=1" >> $GITHUB_ENV
+
     - name: 编译 FIP
       id: compile
       run: |
@@ -128,7 +201,7 @@ jobs:
         
         # 解析需要编译的版本列表
         if [ "${{ github.event.inputs.FIP_VERSION }}" = "all" ]; then
-          SUPPORTED_VERSIONS=("2022" "2023" "2024" "2025")
+          SUPPORTED_VERSIONS=("2022" "2023" "2024")
           echo "检测到 all，将编译：${SUPPORTED_VERSIONS[*]}"
         else
           IFS=',' read -ra SUPPORTED_VERSIONS <<< "${{ github.event.inputs.FIP_VERSION }}"
@@ -180,11 +253,16 @@ jobs:
         cd bl-mt798x
         # 获取当前时间戳
         TIMESTAMP=$(date +"%Y%m%d-%H%M%S")
+        # 重命名 OC_BL2
+        if [ "${{ env.OC_BL2 }}" = "1" ]; then
+          for file in output/*; do
+            if [[ "$file" == *"bl2.bin"* ]]; then
+              mv "$file" "${file%.bin}_oc1.6GHz.bin"
+            fi
+          done
+        fi
         # 重命名 output 目录下的文件
         if [ -d "output" ]; then
-          for file in output/*fip*.bin; do
-            mv "$file" "${file%.bin}-dhcp.bin"
-          done
           rename "s/(.*)\.(.*)/\$1_${TIMESTAMP}.\$2/" output/*
         fi
         # 重命名 output_gpt 目录下的文件
@@ -215,9 +293,25 @@ jobs:
       if: env.UPLOAD_RELEASE == 'true' && !cancelled()
       run: |
         touch release.txt
+        echo "- 适配机型：${{ env.UPLOAD_TAG_NAME }}" >> release.txt
         echo "- 使用源码：${{ env.REPO_URL }}" >> release.txt
         echo "- 使用分支：${{ env.REPO_BRANCH }}" >> release.txt
         echo "- 使用版本：${{ github.event.inputs.FIP_VERSION }}" >> release.txt
+        if [ "${{ github.event.inputs.GEN_BL2 }}" = "true" ]; then
+          echo "- 已开启 ATF22/23 BL2 生成" >> release.txt
+        else
+          echo "- 未开启 ATF22/23 BL2 生成" >> release.txt
+        fi
+        if [ "${{ github.event.inputs.OC_BL2 }}" = "true" ]; then
+          echo "- 已应用1.6GHz BL2超频补丁" >> release.txt
+        else
+          echo "- 未应用1.6GHz BL2超频补丁" >> release.txt
+        fi
+        if [ "${{ github.event.inputs.GPT_GEN }}" = "true" ]; then
+          echo "- 已生成GPT分区表镜像" >> release.txt
+        else
+          echo "- 未生成GPT分区表镜像" >> release.txt
+        fi
         echo "- 编译时间：${{ env.FILE_DATE }}" >> release.txt
         echo "release_tag=${{ env.FILE_DATE }}-${{ env.UPLOAD_TAG_NAME }}" >> $GITHUB_OUTPUT
         echo "status=success" >> $GITHUB_OUTPUT

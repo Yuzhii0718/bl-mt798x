@@ -1,0 +1,135 @@
+From 9052f4e781690426975f9ed8b2f3a70e3aca431a Mon Sep 17 00:00:00 2001
+From: Yuzhii0718
+Date: Fri, 19 Dec 2025 15:47:11 +0800
+Subject: [PATCH] overclocking mt7981 to 1.6GHz by modify atf
+
+---
+ .../plat/mediatek/mt7981/drivers/pll/pll.c    | 19 ++++++++++++++-----
+ .../plat/mediatek/mt7981/drivers/pll/pll.c    | 19 ++++++++++++++-----
+ .../plat/mediatek/mt7981/drivers/pll/pll.c    | 19 ++++++++++++++-----
+ .../plat/mediatek/mt7981/drivers/pll/pll.c    | 19 ++++++++++++++-----
+ 4 files changed, 56 insertions(+), 20 deletions(-)
+
+diff --git a/atf-20220606-637ba581b/plat/mediatek/mt7981/drivers/pll/pll.c b/atf-20220606-637ba581b/plat/mediatek/mt7981/drivers/pll/pll.c
+index 588aacf22..316141ce6 100644
+--- a/atf-20220606-637ba581b/plat/mediatek/mt7981/drivers/pll/pll.c
++++ b/atf-20220606-637ba581b/plat/mediatek/mt7981/drivers/pll/pll.c
+@@ -94,11 +94,20 @@ void mtk_pll_init(int skip_dcm_setting)
+ 	mmio_clrbits_32(MPLL_PWR_CON0, CON0_ISO_EN);
+ 
+ 	/* Set PLL frequency */
+-	mmio_write_32(ARMPLL_CON1, 0x82000000); /* 1.3G */
+-
+-	//mmio_setbits_32(ARMPLL_CON0, 0x124); /* divider for 650M */
+-
+-	mmio_setbits_32(ARMPLL_CON0, 0x114); /* divider for 1.3G */
++	// 251218: overclock hack
++	NOTICE("THIS IS AN OVERCLOKING BL2!\n");
++	NOTICE("set arm freq to 1.60 GHz:\n");
++
++	// mmio_write_32(ARMPLL_CON1, 0x82000000); /* 1.3G */
++	mmio_write_32(ARMPLL_CON1, 0x50000000); /* 1.6G */
++	// mmio_write_32(ARMPLL_CON1, 0x55000000); /* 1.7G */
++	NOTICE("ARMPLL_CON1 = 0x%x\n", mmio_read_32(ARMPLL_CON1));
++
++	// mmio_setbits_32(ARMPLL_CON0, 0x124); /* divider for 650M */
++	// mmio_setbits_32(ARMPLL_CON0, 0x114); /* divider for 1.3G */
++	mmio_clrbits_32(ARMPLL_CON0, 0x70); /* divider for >1.3G */
++	mmio_setbits_32(ARMPLL_CON0, 0x104);
++	NOTICE("ARMPLL_CON0 = 0x%x\n", mmio_read_32(ARMPLL_CON0));
+ 
+ 	mmio_setbits_32(NET2PLL_CON0, 0x114);
+ 	mmio_setbits_32(MMPLL_CON0, 0x124);
+diff --git a/atf-20231013-0ea67d76a/plat/mediatek/mt7981/drivers/pll/pll.c b/atf-20231013-0ea67d76a/plat/mediatek/mt7981/drivers/pll/pll.c
+index 588aacf22..316141ce6 100644
+--- a/atf-20231013-0ea67d76a/plat/mediatek/mt7981/drivers/pll/pll.c
++++ b/atf-20231013-0ea67d76a/plat/mediatek/mt7981/drivers/pll/pll.c
+@@ -94,11 +94,20 @@ void mtk_pll_init(int skip_dcm_setting)
+ 	mmio_clrbits_32(MPLL_PWR_CON0, CON0_ISO_EN);
+ 
+ 	/* Set PLL frequency */
+-	mmio_write_32(ARMPLL_CON1, 0x82000000); /* 1.3G */
+-
+-	//mmio_setbits_32(ARMPLL_CON0, 0x124); /* divider for 650M */
+-
+-	mmio_setbits_32(ARMPLL_CON0, 0x114); /* divider for 1.3G */
++	// 251218: overclock hack
++	NOTICE("THIS IS AN OVERCLOKING BL2!\n");
++	NOTICE("set arm freq to 1.60 GHz:\n");
++
++	// mmio_write_32(ARMPLL_CON1, 0x82000000); /* 1.3G */
++	mmio_write_32(ARMPLL_CON1, 0x50000000); /* 1.6G */
++	// mmio_write_32(ARMPLL_CON1, 0x55000000); /* 1.7G */
++	NOTICE("ARMPLL_CON1 = 0x%x\n", mmio_read_32(ARMPLL_CON1));
++
++	// mmio_setbits_32(ARMPLL_CON0, 0x124); /* divider for 650M */
++	// mmio_setbits_32(ARMPLL_CON0, 0x114); /* divider for 1.3G */
++	mmio_clrbits_32(ARMPLL_CON0, 0x70); /* divider for >1.3G */
++	mmio_setbits_32(ARMPLL_CON0, 0x104);
++	NOTICE("ARMPLL_CON0 = 0x%x\n", mmio_read_32(ARMPLL_CON0));
+ 
+ 	mmio_setbits_32(NET2PLL_CON0, 0x114);
+ 	mmio_setbits_32(MMPLL_CON0, 0x124);
+diff --git a/atf-20240117-bacca82a8/plat/mediatek/mt7981/drivers/pll/pll.c b/atf-20240117-bacca82a8/plat/mediatek/mt7981/drivers/pll/pll.c
+index 6a064d203..77d935811 100644
+--- a/atf-20240117-bacca82a8/plat/mediatek/mt7981/drivers/pll/pll.c
++++ b/atf-20240117-bacca82a8/plat/mediatek/mt7981/drivers/pll/pll.c
+@@ -94,11 +94,20 @@ void mtk_pll_init(int skip_dcm_setting)
+ 	mmio_clrbits_32(MPLL_PWR_CON0, CON0_ISO_EN);
+ 
+ 	/* Set PLL frequency */
+-	mmio_write_32(ARMPLL_CON1, 0x82000000); /* 1.3G */
+-
+-	//mmio_setbits_32(ARMPLL_CON0, 0x124); /* divider for 650M */
+-
+-	mmio_setbits_32(ARMPLL_CON0, 0x114); /* divider for 1.3G */
++	// 251218: overclock hack
++	NOTICE("THIS IS AN OVERCLOKING BL2!\n");
++	NOTICE("set arm freq to 1.60 GHz:\n");
++
++	// mmio_write_32(ARMPLL_CON1, 0x82000000); /* 1.3G */
++	mmio_write_32(ARMPLL_CON1, 0x50000000); /* 1.6G */
++	// mmio_write_32(ARMPLL_CON1, 0x55000000); /* 1.7G */
++	NOTICE("ARMPLL_CON1 = 0x%x\n", mmio_read_32(ARMPLL_CON1));
++
++	// mmio_setbits_32(ARMPLL_CON0, 0x124); /* divider for 650M */
++	// mmio_setbits_32(ARMPLL_CON0, 0x114); /* divider for 1.3G */
++	mmio_clrbits_32(ARMPLL_CON0, 0x70); /* divider for >1.3G */
++	mmio_setbits_32(ARMPLL_CON0, 0x104);
++	NOTICE("ARMPLL_CON0 = 0x%x\n", mmio_read_32(ARMPLL_CON0));
+ 
+ 	mmio_setbits_32(NET2PLL_CON0, 0x114);
+ 	mmio_setbits_32(MMPLL_CON0, 0x124);
+diff --git a/atf-20250711/plat/mediatek/mt7981/drivers/pll/pll.c b/atf-20250711/plat/mediatek/mt7981/drivers/pll/pll.c
+index 6a064d203..77d935811 100644
+--- a/atf-20250711/plat/mediatek/mt7981/drivers/pll/pll.c
++++ b/atf-20250711/plat/mediatek/mt7981/drivers/pll/pll.c
+@@ -94,11 +94,20 @@ void mtk_pll_init(int skip_dcm_setting)
+ 	mmio_clrbits_32(MPLL_PWR_CON0, CON0_ISO_EN);
+ 
+ 	/* Set PLL frequency */
+-	mmio_write_32(ARMPLL_CON1, 0x82000000); /* 1.3G */
+-
+-	//mmio_setbits_32(ARMPLL_CON0, 0x124); /* divider for 650M */
+-
+-	mmio_setbits_32(ARMPLL_CON0, 0x114); /* divider for 1.3G */
++	// 251218: overclock hack
++	NOTICE("THIS IS AN OVERCLOKING BL2!\n");
++	NOTICE("set arm freq to 1.60 GHz:\n");
++
++	// mmio_write_32(ARMPLL_CON1, 0x82000000); /* 1.3G */
++	mmio_write_32(ARMPLL_CON1, 0x50000000); /* 1.6G */
++	// mmio_write_32(ARMPLL_CON1, 0x55000000); /* 1.7G */
++	NOTICE("ARMPLL_CON1 = 0x%x\n", mmio_read_32(ARMPLL_CON1));
++
++	// mmio_setbits_32(ARMPLL_CON0, 0x124); /* divider for 650M */
++	// mmio_setbits_32(ARMPLL_CON0, 0x114); /* divider for 1.3G */
++	mmio_clrbits_32(ARMPLL_CON0, 0x70); /* divider for >1.3G */
++	mmio_setbits_32(ARMPLL_CON0, 0x104);
++	NOTICE("ARMPLL_CON0 = 0x%x\n", mmio_read_32(ARMPLL_CON0));
+ 
+ 	mmio_setbits_32(NET2PLL_CON0, 0x114);
+ 	mmio_setbits_32(MMPLL_CON0, 0x124);
+-- 
+2.34.1
+

@@ -124,7 +124,4 @@ if grep -Eq "(^_|CONFIG_TARGET_ALL_NO_SEC_BOOT=y)" "$ATF_DIR/configs/$ATF_CFG"; 
 		echo "bl2 build fail!"
 		exit 1
 	fi
-	if [ "$VERSION" = "2022" ] || [ "$VERSION" = "2023" ]; then
-		build_bl2
-	fi
 fi
