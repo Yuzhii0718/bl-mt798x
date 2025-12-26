@@ -1,6 +1,8 @@
 # ATF and u-boot for mt798x
 
-A modified version of hanwckf's u-boot for mt798x by Yuzhii, with support for auto dhcp, and beautiful webui.
+A modified version of hanwckf's u-boot for mt798x by Yuzhii, with support for auto dhcp, and beautiful webui.(build with version 2023/2024)
+
+Support Actions to build automatically, generate normal/overclocking BL2. 
 
 ## About bl-mt798x
 - https://cmi.hanwckf.top/p/mt798x-uboot-usage
@@ -9,7 +11,7 @@ A modified version of hanwckf's u-boot for mt798x by Yuzhii, with support for au
 
 ## Prepare
 
-```
+```bash
 sudo apt install gcc-aarch64-linux-gnu build-essential flex bison libssl-dev device-tree-compiler qemu-user-static
 ```
 
@@ -19,6 +21,7 @@ sudo apt install gcc-aarch64-linux-gnu build-essential flex bison libssl-dev dev
 chmod +x build.sh
 SOC=mt7981 BOARD=360t7 VERSION=2022 ./build.sh
 ```
+
 > SOC=mt7981/mt7986
 > VERSION=2022/2023/2024/2025
 
@@ -42,10 +45,14 @@ chmod +x generate_gpt.sh
 
 Generate file will be in `output_gpt`
 
+> You need add your device's partition info json file in "atf-20231013-0ea67d76a/tools/dev/gpt_editor/mt798x", like e.g. "philips-hy3000_128G_rootfs1024M_production1024M-gpt.json"
+
 ## Use Action to build
 
 - [x] Build FIP
 - [ ] Build GPT (Optional)
+- [ ] Build BL2 (Normal)
+- [ ] Build BL2 (Overclocking)
 
 ---
 
