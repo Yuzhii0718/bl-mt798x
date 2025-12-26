@@ -14,6 +14,7 @@
 #include <net.h>
 #include <net/mtk_tcp.h>
 #include <net/mtk_httpd.h>
+#include <net/mtk_dhcpd.h>
 #include <u-boot/md5.h>
 #include <linux/stringify.h>
 #include <dm/ofnode.h>
@@ -409,7 +410,13 @@ int start_web_failsafe(void)
 	httpd_register_uri_handler(inst, "/version", &version_handler, NULL);
 	httpd_register_uri_handler(inst, "", &not_found_handler, NULL);
 
+	if (IS_ENABLED(CONFIG_MTK_DHCPD))
+		mtk_dhcpd_start();
+
 	net_loop(MTK_TCP);
+
+	if (IS_ENABLED(CONFIG_MTK_DHCPD))
+		mtk_dhcpd_stop();
 
 	return 0;
 }
