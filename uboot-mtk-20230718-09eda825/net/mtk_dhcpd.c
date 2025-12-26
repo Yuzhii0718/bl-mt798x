@@ -445,8 +445,19 @@ int mtk_dhcpd_start(void)
 {
 	struct in_addr pool_start;
 
-	if (dhcpd_running)
+	/*
+	 * Be robust against net_init()/net_clear_handlers() resetting handlers.
+	 * If we're already running but the UDP handler is no longer ours, re-hook.
+	 */
+	if (dhcpd_running) {
+		rxhand_f *cur = net_get_udp_handler();
+
+		if (cur != dhcpd_udp_handler) {
+			prev_udp_handler = cur;
+			net_set_udp_handler(dhcpd_udp_handler);
+		}
 		return 0;
+	}
 
 	/* Ensure we have a usable local IP, otherwise UDP replies will use 0.0.0.0 */
 	if (!net_ip.s_addr)
@@ -476,7 +487,13 @@ void mtk_dhcpd_stop(void)
 	if (!dhcpd_running)
 		return;
 
-	net_set_udp_handler(prev_udp_handler);
+	/*
+	 * If the network loop already cleared handlers, don't resurrect another
+	 * handler here. We only restore the previous handler if we are still
+	 * installed.
+	 */
+	if (net_get_udp_handler() == dhcpd_udp_handler)
+		net_set_udp_handler(prev_udp_handler);
 	prev_udp_handler = NULL;
 	dhcpd_running = false;
 }
