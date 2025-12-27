@@ -1,0 +1,63 @@
+name: Build FIT BL2 and FIP
+
+on:
+  push:
+
+jobs:
+  generate_list:
+    name: Generate build list
+    runs-on: ubuntu-latest
+    outputs:
+      list: ${{ steps.list.outputs.list }}
+
+    steps:
+      - name: Checkout source tree
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: '0'
+
+      - name: Generate build list
+        id: list
+        run: |
+          COMMIT="$(git log --pretty=format:"%H" -1 uboot-mtk-*/configs)"
+          CONFIGS="$(git show --name-only "$COMMIT" | awk -F '/' '/^uboot.*defconfig$/ {printf "\"%s\",", $NF}' | sed 's/,$//')"
+          JSON_LIST="{\"runner\": [\"ubuntu-latest\"],\"list\": [$CONFIGS]}"
+          echo "$JSON_LIST" | jq .
+          echo "list=$JSON_LIST" >> "$GITHUB_OUTPUT"
+
+  build:
+    name: Build ${{ matrix.list }}
+    needs: generate_list
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      matrix: ${{ fromJson(needs.generate_list.outputs.list) }}
+      fail-fast: false
+      max-parallel: 15
+
+    steps:
+      - name: Install dependencies
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo -E apt-get install gcc-aarch64-linux-gnu build-essential flex bison libssl-dev device-tree-compiler
+
+      - name: Checkout source tree
+        uses: actions/checkout@v4
+
+      - name: Build BL2 and FIP
+        env:
+          CONFIG: ${{ matrix.list }}
+        run: |
+          export SOC="${CONFIG%%_*}"
+          BOARD="${CONFIG#*_}"
+          export BOARD="${BOARD%_*}"
+          mkdir -p "output"
+          ./build.sh 2>&1 | tee "output/build.log"
+          sha256sum "output"/* | sed "s|output/||" > "output/sha256sums"
+          echo "ARTIFACT_NAME=$SOC-$BOARD" >> "$GITHUB_ENV"
+
+      - name: Upload build outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.ARTIFACT_NAME }}
+          path: output/*
