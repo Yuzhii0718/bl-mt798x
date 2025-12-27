@@ -129,7 +129,7 @@ static const struct spinand_info esmt_c8_spinand_table[] = {
 static const struct spinand_info esmt_8c_spinand_table[] = {
 	SPINAND_INFO("F50L1G41LC",
 		     SPINAND_ID(SPINAND_READID_METHOD_OPCODE_ADDR, 0x2C),
-		     NAND_MEMORG(1, 2048, 64, 64, 1024, 1, 1, 1),
+			 NAND_MEMORG(1, 2048, 64, 64, 1024, 20, 1, 1, 1),
 		     NAND_ECCREQ(1, 512),
 		     SPINAND_INFO_OP_VARIANTS(&read_cache_variants,
 					      &write_cache_variants,
