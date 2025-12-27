@@ -1,13 +1,15 @@
 # ATF and u-boot for mt798x
 
-A modified version of hanwckf's u-boot for mt798x by Yuzhii, with support for auto dhcp, and beautiful webui.(build with version 2023/2024)
+A modified version of hanwckf's u-boot for mt798x by Yuzhii, with support for auto dhcp, and beautiful webui.(build with version 2022/2023/2024)
 
 Support Actions to build automatically, generate normal/overclocking BL2. 
 
 ## About bl-mt798x
 - https://cmi.hanwckf.top/p/mt798x-uboot-usage
 
-![webui](document/webui.png)
+![Version-2022](document/uboot-2022.png)
+
+![Version-2023/2024](document/uboot-2023.png)
 
 ## Prepare
 
@@ -20,10 +22,14 @@ sudo apt install gcc-aarch64-linux-gnu build-essential flex bison libssl-dev dev
 ```bash
 chmod +x build.sh
 SOC=mt7981 BOARD=360t7 VERSION=2022 ./build.sh
+SOC=mt7981 BOARD=cmcc_a10 VERSION=2024 MULTI_LAYOUT=1 ./build.sh
 ```
 
 > SOC=mt7981/mt7986
+
 > VERSION=2022/2023/2024/2025
+
+> MULTI_LAYOUT=1 (Optional, only for multi-layout devices, e.g. xiaomi-wr30u, redmi-ax6000)
 
 > The diffence of every version
 
@@ -50,13 +56,15 @@ Generate file will be in `output_gpt`
 ## Use Action to build
 
 - [x] Build FIP
-- [ ] Build GPT (Optional)
+- [ ] Build GPT (Only gpt.json exists)
 - [ ] Build BL2 (Normal)
 - [ ] Build BL2 (Overclocking)
+- [ ] Multi-layout support (Only for multi-layout devices)
 
 ---
 
 ### xiaomi-wr30u multi-layout uboot firmware compatibility
+
 |Firmware type|uboot (default)|uboot (immortalwrt-112m)|uboot (qwrt)|
 |:----:|:----:|:----:|:----:|
 |[xiaomi stock mtd8/mtd9](https://github.com/hanwckf/xiaomi-router-stock-ubi-bin/tree/main/xiaomi-wr30u)|√|×|×|
@@ -76,6 +84,7 @@ Generate file will be in `output_gpt`
 |[X-Wrt ubootmod](https://github.com/x-wrt/x-wrt/blob/master/target/linux/mediatek/dts/mt7981b-xiaomi-mi-router-wr30u-ubootmod.dts)|×|×|×|
 
 ### redmi-ax6000 multi-layout uboot firmware compatibility
+
 |Firmware type|uboot (default)|uboot (immortalwrt-110m)|
 |:----:|:----:|:----:|
 |[xiaomi stock mtd8/mtd9](https://github.com/hanwckf/xiaomi-router-stock-ubi-bin/tree/main/redmi-ax6000)|√|×|
