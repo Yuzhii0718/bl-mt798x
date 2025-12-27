@@ -1,0 +1,1743 @@
+From 51605f2382f4eeb08f70b29e45e9b3feac24cd96 Mon Sep 17 00:00:00 2001
+From: 1715173329
+Date: Sat, 27 Dec 2025 23:22:22 +0800
+Subject: [PATCH] uboot-2022: fit: merge code from 1715173329 to support fit
+ image
+
+---
+ .../configs/mt7981_360t7_defconfig            |  3 ++-
+ .../configs/mt7981_abt_asr3000_defconfig      |  3 ++-
+ .../configs/mt7981_ax3000t_defconfig          |  3 ++-
+ .../configs/mt7981_cetron_ct3003_defconfig    |  3 ++-
+ .../configs/mt7981_cmcc_a10_defconfig         |  3 ++-
+ .../configs/mt7981_cmcc_rax3000m_defconfig    |  3 ++-
+ .../configs/mt7981_cudy_tr3000-v1_defconfig   |  1 +
+ .../mt7981_h3c_magic-nx30-pro_defconfig       |  3 ++-
+ .../configs/mt7981_imou_lc-hx3001_defconfig   |  3 ++-
+ .../configs/mt7981_jcg_q30_defconfig          |  3 ++-
+ .../configs/mt7981_konka_komi-a31_defconfig   |  3 ++-
+ .../configs/mt7981_livinet_zr-3020_defconfig  |  3 ++-
+ .../configs/mt7981_nokia_ea0326gmp_defconfig  |  3 ++-
+ .../configs/mt7981_wr30u_defconfig            |  3 ++-
+ .../configs/mt7986_netcore_n60-pro_defconfig  |  3 ++-
+ .../configs/mt7986_netcore_n60_defconfig      |  3 ++-
+ .../configs/mt7986_redmi_ax6000_defconfig     |  3 ++-
+ .../configs/mt7981_360t7_defconfig            |  1 +
+ .../configs/mt7981_abt_asr3000_defconfig      |  1 +
+ .../configs/mt7981_ax3000t_defconfig          |  1 +
+ .../configs/mt7981_cetron_ct3003_defconfig    |  1 +
+ .../configs/mt7981_cmcc_a10_defconfig         |  1 +
+ .../configs/mt7981_cmcc_rax3000m_defconfig    |  1 +
+ .../configs/mt7981_cudy_tr3000-v1_defconfig   |  1 +
+ .../mt7981_h3c_magic-nx30-pro_defconfig       |  1 +
+ .../configs/mt7981_imou_lc-hx3001_defconfig   |  1 +
+ .../configs/mt7981_jcg_q30_defconfig          |  1 +
+ .../configs/mt7981_konka_komi-a31_defconfig   |  1 +
+ .../configs/mt7981_livinet_zr-3020_defconfig  |  1 +
+ .../configs/mt7981_nokia_ea0326gmp_defconfig  |  1 +
+ .../configs/mt7981_wr30u_defconfig            |  1 +
+ .../configs/mt7986_netcore_n60-pro_defconfig  |  1 +
+ .../configs/mt7986_netcore_n60_defconfig      |  1 +
+ .../configs/mt7986_redmi_ax6000_defconfig     |  1 +
+ build.sh                                      |  1 +
+ .../arch/arm/dts/mt7981-abt_asr3000.dts       |  4 ++++
+ .../arch/arm/dts/mt7981-cetron_ct3003.dts     |  4 ++++
+ .../arm/dts/mt7981-cmcc-rax3000m-emmc.dts     |  5 +++++
+ .../arch/arm/dts/mt7981-cmcc-rax3000m.dts     |  4 ++++
+ .../arch/arm/dts/mt7981-konka_komi-a31.dts    |  2 +-
+ .../arch/arm/dts/mt7981-livinet_zr-3020.dts   |  4 ++++
+ .../arch/arm/dts/mt7981-nokia-ea0326gmp.dts   |  4 ++++
+ .../arch/arm/dts/mt7986a-jdcloud_re-cp-03.dts |  4 ++++
+ .../board/mediatek/common/ubi_helper.c        |  4 ++--
+ .../board/mediatek/mt7622/bootmenu_emmc.c     |  4 ++--
+ .../board/mediatek/mt7981/bootmenu_emmc.c     |  4 ++--
+ .../board/mediatek/mt7986/bootmenu_emmc.c     |  4 ++--
+ .../board/mediatek/mt7988/bootmenu_emmc.c     |  4 ++--
+ .../configs/mt7981_360t7_defconfig            | 17 +++++++-------
+ .../configs/mt7981_abt_asr3000_defconfig      | 17 ++++++++------
+ .../configs/mt7981_ax3000t_an8855_defconfig   | 17 ++++++--------
+ .../configs/mt7981_ax3000t_defconfig          | 17 ++++++--------
+ .../configs/mt7981_cetron_ct3003_defconfig    | 19 ++++++++--------
+ .../configs/mt7981_cmcc_a10_defconfig         | 22 +++++++++----------
+ .../mt7981_cmcc_rax3000m-emmc_defconfig       |  6 ++++-
+ .../configs/mt7981_cmcc_rax3000m_defconfig    | 20 +++++++++--------
+ .../configs/mt7981_cudy_tr3000-v1_defconfig   | 16 +++++++-------
+ .../mt7981_h3c_magic-nx30-pro_defconfig       | 17 +++++++-------
+ .../configs/mt7981_imou_lc-hx3001_defconfig   | 18 +++++++--------
+ .../configs/mt7981_jcg_q30_defconfig          | 17 +++++++-------
+ .../configs/mt7981_konka_komi-a31_defconfig   | 19 ++++++++--------
+ .../configs/mt7981_livinet_zr-3020_defconfig  | 19 ++++++++--------
+ .../configs/mt7981_nokia_ea0326gmp_defconfig  | 19 ++++++++--------
+ .../configs/mt7981_wr30u_defconfig            | 18 +++++++--------
+ .../configs/mt7986_jdcloud_re-cp-03_defconfig |  5 ++++-
+ .../configs/mt7986_netcore_n60-pro_defconfig  | 17 +++++++-------
+ .../configs/mt7986_netcore_n60_defconfig      | 17 +++++++-------
+ .../configs/mt7986_redmi_ax6000_defconfig     | 17 +++++++-------
+ .../mt7986_tplink_tl-xdr608x_defconfig        | 13 ++++++-----
+ .../mt7986_tplink_tl-xtr8488_defconfig        |  8 +++++++
+ 70 files changed, 274 insertions(+), 199 deletions(-)
+
+diff --git a/atf-20220606-637ba581b/configs/mt7981_360t7_defconfig b/atf-20220606-637ba581b/configs/mt7981_360t7_defconfig
+index 6378231f5..2d6d7170c 100644
+--- a/atf-20220606-637ba581b/configs/mt7981_360t7_defconfig
++++ b/atf-20220606-637ba581b/configs/mt7981_360t7_defconfig
+@@ -1,5 +1,6 @@
+ CONFIG_PLAT_MT7981=y
+-CONFIG_TARGET_FIP_NO_SEC_BOOT=y
++CONFIG_TARGET_ALL_NO_SEC_BOOT=y
+ CONFIG_FLASH_DEVICE_SPIM_NAND=y
+ CONFIG_BGA=y
+ CONFIG_LOG_LEVEL_INFO=y
++# CONFIG_NMBM is not set
+diff --git a/atf-20220606-637ba581b/configs/mt7981_abt_asr3000_defconfig b/atf-20220606-637ba581b/configs/mt7981_abt_asr3000_defconfig
+index 6378231f5..2d6d7170c 100644
+--- a/atf-20220606-637ba581b/configs/mt7981_abt_asr3000_defconfig
++++ b/atf-20220606-637ba581b/configs/mt7981_abt_asr3000_defconfig
+@@ -1,5 +1,6 @@
+ CONFIG_PLAT_MT7981=y
+-CONFIG_TARGET_FIP_NO_SEC_BOOT=y
++CONFIG_TARGET_ALL_NO_SEC_BOOT=y
+ CONFIG_FLASH_DEVICE_SPIM_NAND=y
+ CONFIG_BGA=y
+ CONFIG_LOG_LEVEL_INFO=y
++# CONFIG_NMBM is not set
+diff --git a/atf-20220606-637ba581b/configs/mt7981_ax3000t_defconfig b/atf-20220606-637ba581b/configs/mt7981_ax3000t_defconfig
+index 6378231f5..2d6d7170c 100644
+--- a/atf-20220606-637ba581b/configs/mt7981_ax3000t_defconfig
++++ b/atf-20220606-637ba581b/configs/mt7981_ax3000t_defconfig
+@@ -1,5 +1,6 @@
+ CONFIG_PLAT_MT7981=y
+-CONFIG_TARGET_FIP_NO_SEC_BOOT=y
++CONFIG_TARGET_ALL_NO_SEC_BOOT=y
+ CONFIG_FLASH_DEVICE_SPIM_NAND=y
+ CONFIG_BGA=y
+ CONFIG_LOG_LEVEL_INFO=y
++# CONFIG_NMBM is not set
+diff --git a/atf-20220606-637ba581b/configs/mt7981_cetron_ct3003_defconfig b/atf-20220606-637ba581b/configs/mt7981_cetron_ct3003_defconfig
+index 6378231f5..2d6d7170c 100644
+--- a/atf-20220606-637ba581b/configs/mt7981_cetron_ct3003_defconfig
++++ b/atf-20220606-637ba581b/configs/mt7981_cetron_ct3003_defconfig
+@@ -1,5 +1,6 @@
+ CONFIG_PLAT_MT7981=y
+-CONFIG_TARGET_FIP_NO_SEC_BOOT=y
++CONFIG_TARGET_ALL_NO_SEC_BOOT=y
+ CONFIG_FLASH_DEVICE_SPIM_NAND=y
+ CONFIG_BGA=y
+ CONFIG_LOG_LEVEL_INFO=y
++# CONFIG_NMBM is not set
+diff --git a/atf-20220606-637ba581b/configs/mt7981_cmcc_a10_defconfig b/atf-20220606-637ba581b/configs/mt7981_cmcc_a10_defconfig
+index 6378231f5..2d6d7170c 100644
+--- a/atf-20220606-637ba581b/configs/mt7981_cmcc_a10_defconfig
++++ b/atf-20220606-637ba581b/configs/mt7981_cmcc_a10_defconfig
+@@ -1,5 +1,6 @@
+ CONFIG_PLAT_MT7981=y
+-CONFIG_TARGET_FIP_NO_SEC_BOOT=y
++CONFIG_TARGET_ALL_NO_SEC_BOOT=y
+ CONFIG_FLASH_DEVICE_SPIM_NAND=y
+ CONFIG_BGA=y
+ CONFIG_LOG_LEVEL_INFO=y
++# CONFIG_NMBM is not set
+diff --git a/atf-20220606-637ba581b/configs/mt7981_cmcc_rax3000m_defconfig b/atf-20220606-637ba581b/configs/mt7981_cmcc_rax3000m_defconfig
+index d1951deed..a5c342647 100644
+--- a/atf-20220606-637ba581b/configs/mt7981_cmcc_rax3000m_defconfig
++++ b/atf-20220606-637ba581b/configs/mt7981_cmcc_rax3000m_defconfig
+@@ -1,6 +1,7 @@
+ CONFIG_PLAT_MT7981=y
+ CONFIG_DRAM_DDR4=y
+-CONFIG_TARGET_FIP_NO_SEC_BOOT=y
++CONFIG_TARGET_ALL_NO_SEC_BOOT=y
+ CONFIG_FLASH_DEVICE_SPIM_NAND=y
+ CONFIG_BGA=y
+ CONFIG_LOG_LEVEL_INFO=y
++# CONFIG_NMBM is not set
+diff --git a/atf-20220606-637ba581b/configs/mt7981_cudy_tr3000-v1_defconfig b/atf-20220606-637ba581b/configs/mt7981_cudy_tr3000-v1_defconfig
+index 6378231f5..23fc9778d 100644
+--- a/atf-20220606-637ba581b/configs/mt7981_cudy_tr3000-v1_defconfig
++++ b/atf-20220606-637ba581b/configs/mt7981_cudy_tr3000-v1_defconfig
+@@ -3,3 +3,4 @@ CONFIG_TARGET_FIP_NO_SEC_BOOT=y
+ CONFIG_FLASH_DEVICE_SPIM_NAND=y
+ CONFIG_BGA=y
+ CONFIG_LOG_LEVEL_INFO=y
++# CONFIG_NMBM is not set
+diff --git a/atf-20220606-637ba581b/configs/mt7981_h3c_magic-nx30-pro_defconfig b/atf-20220606-637ba581b/configs/mt7981_h3c_magic-nx30-pro_defconfig
+index 6378231f5..2d6d7170c 100644
+--- a/atf-20220606-637ba581b/configs/mt7981_h3c_magic-nx30-pro_defconfig
++++ b/atf-20220606-637ba581b/configs/mt7981_h3c_magic-nx30-pro_defconfig
+@@ -1,5 +1,6 @@
+ CONFIG_PLAT_MT7981=y
+-CONFIG_TARGET_FIP_NO_SEC_BOOT=y
++CONFIG_TARGET_ALL_NO_SEC_BOOT=y
+ CONFIG_FLASH_DEVICE_SPIM_NAND=y
+ CONFIG_BGA=y
+ CONFIG_LOG_LEVEL_INFO=y
++# CONFIG_NMBM is not set
+diff --git a/atf-20220606-637ba581b/configs/mt7981_imou_lc-hx3001_defconfig b/atf-20220606-637ba581b/configs/mt7981_imou_lc-hx3001_defconfig
+index 6378231f5..2d6d7170c 100644
+--- a/atf-20220606-637ba581b/configs/mt7981_imou_lc-hx3001_defconfig
++++ b/atf-20220606-637ba581b/configs/mt7981_imou_lc-hx3001_defconfig
+@@ -1,5 +1,6 @@
+ CONFIG_PLAT_MT7981=y
+-CONFIG_TARGET_FIP_NO_SEC_BOOT=y
++CONFIG_TARGET_ALL_NO_SEC_BOOT=y
+ CONFIG_FLASH_DEVICE_SPIM_NAND=y
+ CONFIG_BGA=y
+ CONFIG_LOG_LEVEL_INFO=y
++# CONFIG_NMBM is not set
+diff --git a/atf-20220606-637ba581b/configs/mt7981_jcg_q30_defconfig b/atf-20220606-637ba581b/configs/mt7981_jcg_q30_defconfig
+index 6378231f5..2d6d7170c 100644
+--- a/atf-20220606-637ba581b/configs/mt7981_jcg_q30_defconfig
++++ b/atf-20220606-637ba581b/configs/mt7981_jcg_q30_defconfig
+@@ -1,5 +1,6 @@
+ CONFIG_PLAT_MT7981=y
+-CONFIG_TARGET_FIP_NO_SEC_BOOT=y
++CONFIG_TARGET_ALL_NO_SEC_BOOT=y
+ CONFIG_FLASH_DEVICE_SPIM_NAND=y
+ CONFIG_BGA=y
+ CONFIG_LOG_LEVEL_INFO=y
++# CONFIG_NMBM is not set
+diff --git a/atf-20220606-637ba581b/configs/mt7981_konka_komi-a31_defconfig b/atf-20220606-637ba581b/configs/mt7981_konka_komi-a31_defconfig
+index 6378231f5..2d6d7170c 100644
+--- a/atf-20220606-637ba581b/configs/mt7981_konka_komi-a31_defconfig
++++ b/atf-20220606-637ba581b/configs/mt7981_konka_komi-a31_defconfig
+@@ -1,5 +1,6 @@
+ CONFIG_PLAT_MT7981=y
+-CONFIG_TARGET_FIP_NO_SEC_BOOT=y
++CONFIG_TARGET_ALL_NO_SEC_BOOT=y
+ CONFIG_FLASH_DEVICE_SPIM_NAND=y
+ CONFIG_BGA=y
+ CONFIG_LOG_LEVEL_INFO=y
++# CONFIG_NMBM is not set
+diff --git a/atf-20220606-637ba581b/configs/mt7981_livinet_zr-3020_defconfig b/atf-20220606-637ba581b/configs/mt7981_livinet_zr-3020_defconfig
+index 6378231f5..2d6d7170c 100644
+--- a/atf-20220606-637ba581b/configs/mt7981_livinet_zr-3020_defconfig
++++ b/atf-20220606-637ba581b/configs/mt7981_livinet_zr-3020_defconfig
+@@ -1,5 +1,6 @@
+ CONFIG_PLAT_MT7981=y
+-CONFIG_TARGET_FIP_NO_SEC_BOOT=y
++CONFIG_TARGET_ALL_NO_SEC_BOOT=y
+ CONFIG_FLASH_DEVICE_SPIM_NAND=y
+ CONFIG_BGA=y
+ CONFIG_LOG_LEVEL_INFO=y
++# CONFIG_NMBM is not set
+diff --git a/atf-20220606-637ba581b/configs/mt7981_nokia_ea0326gmp_defconfig b/atf-20220606-637ba581b/configs/mt7981_nokia_ea0326gmp_defconfig
+index 6378231f5..2d6d7170c 100644
+--- a/atf-20220606-637ba581b/configs/mt7981_nokia_ea0326gmp_defconfig
++++ b/atf-20220606-637ba581b/configs/mt7981_nokia_ea0326gmp_defconfig
+@@ -1,5 +1,6 @@
+ CONFIG_PLAT_MT7981=y
+-CONFIG_TARGET_FIP_NO_SEC_BOOT=y
++CONFIG_TARGET_ALL_NO_SEC_BOOT=y
+ CONFIG_FLASH_DEVICE_SPIM_NAND=y
+ CONFIG_BGA=y
+ CONFIG_LOG_LEVEL_INFO=y
++# CONFIG_NMBM is not set
+diff --git a/atf-20220606-637ba581b/configs/mt7981_wr30u_defconfig b/atf-20220606-637ba581b/configs/mt7981_wr30u_defconfig
+index 6378231f5..2d6d7170c 100644
+--- a/atf-20220606-637ba581b/configs/mt7981_wr30u_defconfig
++++ b/atf-20220606-637ba581b/configs/mt7981_wr30u_defconfig
+@@ -1,5 +1,6 @@
+ CONFIG_PLAT_MT7981=y
+-CONFIG_TARGET_FIP_NO_SEC_BOOT=y
++CONFIG_TARGET_ALL_NO_SEC_BOOT=y
+ CONFIG_FLASH_DEVICE_SPIM_NAND=y
+ CONFIG_BGA=y
+ CONFIG_LOG_LEVEL_INFO=y
++# CONFIG_NMBM is not set
+diff --git a/atf-20220606-637ba581b/configs/mt7986_netcore_n60-pro_defconfig b/atf-20220606-637ba581b/configs/mt7986_netcore_n60-pro_defconfig
+index 686f369a6..519dd74b1 100644
+--- a/atf-20220606-637ba581b/configs/mt7986_netcore_n60-pro_defconfig
++++ b/atf-20220606-637ba581b/configs/mt7986_netcore_n60-pro_defconfig
+@@ -1,4 +1,5 @@
+ CONFIG_PLAT_MT7986=y
+-CONFIG_TARGET_FIP_NO_SEC_BOOT=y
++CONFIG_TARGET_ALL_NO_SEC_BOOT=y
+ CONFIG_FLASH_DEVICE_SPIM_NAND=y
+ CONFIG_DRAM_DDR4=y
++# CONFIG_NMBM is not set
+diff --git a/atf-20220606-637ba581b/configs/mt7986_netcore_n60_defconfig b/atf-20220606-637ba581b/configs/mt7986_netcore_n60_defconfig
+index 5a6de150a..1bc8ec271 100644
+--- a/atf-20220606-637ba581b/configs/mt7986_netcore_n60_defconfig
++++ b/atf-20220606-637ba581b/configs/mt7986_netcore_n60_defconfig
+@@ -1,3 +1,4 @@
+ CONFIG_PLAT_MT7986=y
+-CONFIG_TARGET_FIP_NO_SEC_BOOT=y
++CONFIG_TARGET_ALL_NO_SEC_BOOT=y
+ CONFIG_FLASH_DEVICE_SPIM_NAND=y
++# CONFIG_NMBM is not set
+diff --git a/atf-20220606-637ba581b/configs/mt7986_redmi_ax6000_defconfig b/atf-20220606-637ba581b/configs/mt7986_redmi_ax6000_defconfig
+index 686f369a6..519dd74b1 100644
+--- a/atf-20220606-637ba581b/configs/mt7986_redmi_ax6000_defconfig
++++ b/atf-20220606-637ba581b/configs/mt7986_redmi_ax6000_defconfig
+@@ -1,4 +1,5 @@
+ CONFIG_PLAT_MT7986=y
+-CONFIG_TARGET_FIP_NO_SEC_BOOT=y
++CONFIG_TARGET_ALL_NO_SEC_BOOT=y
+ CONFIG_FLASH_DEVICE_SPIM_NAND=y
+ CONFIG_DRAM_DDR4=y
++# CONFIG_NMBM is not set
+diff --git a/atf-20240117-bacca82a8/configs/mt7981_360t7_defconfig b/atf-20240117-bacca82a8/configs/mt7981_360t7_defconfig
+index 451d5b8f3..87bdd8f06 100644
+--- a/atf-20240117-bacca82a8/configs/mt7981_360t7_defconfig
++++ b/atf-20240117-bacca82a8/configs/mt7981_360t7_defconfig
+@@ -1,3 +1,4 @@
+ _PLAT_MT7981=y
+ _MT7981_BOARD_BGA=y
+ _LOG_LEVEL_INFO=y
++_NAND_SKIP_BAD=y
+diff --git a/atf-20240117-bacca82a8/configs/mt7981_abt_asr3000_defconfig b/atf-20240117-bacca82a8/configs/mt7981_abt_asr3000_defconfig
+index 451d5b8f3..87bdd8f06 100644
+--- a/atf-20240117-bacca82a8/configs/mt7981_abt_asr3000_defconfig
++++ b/atf-20240117-bacca82a8/configs/mt7981_abt_asr3000_defconfig
+@@ -1,3 +1,4 @@
+ _PLAT_MT7981=y
+ _MT7981_BOARD_BGA=y
+ _LOG_LEVEL_INFO=y
++_NAND_SKIP_BAD=y
+diff --git a/atf-20240117-bacca82a8/configs/mt7981_ax3000t_defconfig b/atf-20240117-bacca82a8/configs/mt7981_ax3000t_defconfig
+index 451d5b8f3..87bdd8f06 100644
+--- a/atf-20240117-bacca82a8/configs/mt7981_ax3000t_defconfig
++++ b/atf-20240117-bacca82a8/configs/mt7981_ax3000t_defconfig
+@@ -1,3 +1,4 @@
+ _PLAT_MT7981=y
+ _MT7981_BOARD_BGA=y
+ _LOG_LEVEL_INFO=y
++_NAND_SKIP_BAD=y
+diff --git a/atf-20240117-bacca82a8/configs/mt7981_cetron_ct3003_defconfig b/atf-20240117-bacca82a8/configs/mt7981_cetron_ct3003_defconfig
+index 451d5b8f3..87bdd8f06 100644
+--- a/atf-20240117-bacca82a8/configs/mt7981_cetron_ct3003_defconfig
++++ b/atf-20240117-bacca82a8/configs/mt7981_cetron_ct3003_defconfig
+@@ -1,3 +1,4 @@
+ _PLAT_MT7981=y
+ _MT7981_BOARD_BGA=y
+ _LOG_LEVEL_INFO=y
++_NAND_SKIP_BAD=y
+diff --git a/atf-20240117-bacca82a8/configs/mt7981_cmcc_a10_defconfig b/atf-20240117-bacca82a8/configs/mt7981_cmcc_a10_defconfig
+index 451d5b8f3..87bdd8f06 100644
+--- a/atf-20240117-bacca82a8/configs/mt7981_cmcc_a10_defconfig
++++ b/atf-20240117-bacca82a8/configs/mt7981_cmcc_a10_defconfig
+@@ -1,3 +1,4 @@
+ _PLAT_MT7981=y
+ _MT7981_BOARD_BGA=y
+ _LOG_LEVEL_INFO=y
++_NAND_SKIP_BAD=y
+diff --git a/atf-20240117-bacca82a8/configs/mt7981_cmcc_rax3000m_defconfig b/atf-20240117-bacca82a8/configs/mt7981_cmcc_rax3000m_defconfig
+index dbfd0b773..5c7b3553c 100644
+--- a/atf-20240117-bacca82a8/configs/mt7981_cmcc_rax3000m_defconfig
++++ b/atf-20240117-bacca82a8/configs/mt7981_cmcc_rax3000m_defconfig
+@@ -1,3 +1,4 @@
+ _PLAT_MT7981=y
+ _DRAM_DDR4=y
+ _LOG_LEVEL_INFO=y
++_NAND_SKIP_BAD=y
+diff --git a/atf-20240117-bacca82a8/configs/mt7981_cudy_tr3000-v1_defconfig b/atf-20240117-bacca82a8/configs/mt7981_cudy_tr3000-v1_defconfig
+index 680e718bc..3620c8e86 100644
+--- a/atf-20240117-bacca82a8/configs/mt7981_cudy_tr3000-v1_defconfig
++++ b/atf-20240117-bacca82a8/configs/mt7981_cudy_tr3000-v1_defconfig
+@@ -1,5 +1,6 @@
+ _PLAT_MT7981=y
+ _MT7981_BOARD_BGA=y
++_NAND_SKIP_BAD=y
+ _ENABLE_OVERRIDE_FIP_BASE=y
+ OVERRIDE_FIP_BASE=0x3c0000
+ _ENABLE_OVERRIDE_FIP_SIZE=y
+diff --git a/atf-20240117-bacca82a8/configs/mt7981_h3c_magic-nx30-pro_defconfig b/atf-20240117-bacca82a8/configs/mt7981_h3c_magic-nx30-pro_defconfig
+index 451d5b8f3..87bdd8f06 100644
+--- a/atf-20240117-bacca82a8/configs/mt7981_h3c_magic-nx30-pro_defconfig
++++ b/atf-20240117-bacca82a8/configs/mt7981_h3c_magic-nx30-pro_defconfig
+@@ -1,3 +1,4 @@
+ _PLAT_MT7981=y
+ _MT7981_BOARD_BGA=y
+ _LOG_LEVEL_INFO=y
++_NAND_SKIP_BAD=y
+diff --git a/atf-20240117-bacca82a8/configs/mt7981_imou_lc-hx3001_defconfig b/atf-20240117-bacca82a8/configs/mt7981_imou_lc-hx3001_defconfig
+index 451d5b8f3..87bdd8f06 100644
+--- a/atf-20240117-bacca82a8/configs/mt7981_imou_lc-hx3001_defconfig
++++ b/atf-20240117-bacca82a8/configs/mt7981_imou_lc-hx3001_defconfig
+@@ -1,3 +1,4 @@
+ _PLAT_MT7981=y
+ _MT7981_BOARD_BGA=y
+ _LOG_LEVEL_INFO=y
++_NAND_SKIP_BAD=y
+diff --git a/atf-20240117-bacca82a8/configs/mt7981_jcg_q30_defconfig b/atf-20240117-bacca82a8/configs/mt7981_jcg_q30_defconfig
+index 451d5b8f3..87bdd8f06 100644
+--- a/atf-20240117-bacca82a8/configs/mt7981_jcg_q30_defconfig
++++ b/atf-20240117-bacca82a8/configs/mt7981_jcg_q30_defconfig
+@@ -1,3 +1,4 @@
+ _PLAT_MT7981=y
+ _MT7981_BOARD_BGA=y
+ _LOG_LEVEL_INFO=y
++_NAND_SKIP_BAD=y
+diff --git a/atf-20240117-bacca82a8/configs/mt7981_konka_komi-a31_defconfig b/atf-20240117-bacca82a8/configs/mt7981_konka_komi-a31_defconfig
+index 451d5b8f3..87bdd8f06 100644
+--- a/atf-20240117-bacca82a8/configs/mt7981_konka_komi-a31_defconfig
++++ b/atf-20240117-bacca82a8/configs/mt7981_konka_komi-a31_defconfig
+@@ -1,3 +1,4 @@
+ _PLAT_MT7981=y
+ _MT7981_BOARD_BGA=y
+ _LOG_LEVEL_INFO=y
++_NAND_SKIP_BAD=y
+diff --git a/atf-20240117-bacca82a8/configs/mt7981_livinet_zr-3020_defconfig b/atf-20240117-bacca82a8/configs/mt7981_livinet_zr-3020_defconfig
+index 451d5b8f3..87bdd8f06 100644
+--- a/atf-20240117-bacca82a8/configs/mt7981_livinet_zr-3020_defconfig
++++ b/atf-20240117-bacca82a8/configs/mt7981_livinet_zr-3020_defconfig
+@@ -1,3 +1,4 @@
+ _PLAT_MT7981=y
+ _MT7981_BOARD_BGA=y
+ _LOG_LEVEL_INFO=y
++_NAND_SKIP_BAD=y
+diff --git a/atf-20240117-bacca82a8/configs/mt7981_nokia_ea0326gmp_defconfig b/atf-20240117-bacca82a8/configs/mt7981_nokia_ea0326gmp_defconfig
+index 451d5b8f3..87bdd8f06 100644
+--- a/atf-20240117-bacca82a8/configs/mt7981_nokia_ea0326gmp_defconfig
++++ b/atf-20240117-bacca82a8/configs/mt7981_nokia_ea0326gmp_defconfig
+@@ -1,3 +1,4 @@
+ _PLAT_MT7981=y
+ _MT7981_BOARD_BGA=y
+ _LOG_LEVEL_INFO=y
++_NAND_SKIP_BAD=y
+diff --git a/atf-20240117-bacca82a8/configs/mt7981_wr30u_defconfig b/atf-20240117-bacca82a8/configs/mt7981_wr30u_defconfig
+index 451d5b8f3..87bdd8f06 100644
+--- a/atf-20240117-bacca82a8/configs/mt7981_wr30u_defconfig
++++ b/atf-20240117-bacca82a8/configs/mt7981_wr30u_defconfig
+@@ -1,3 +1,4 @@
+ _PLAT_MT7981=y
+ _MT7981_BOARD_BGA=y
+ _LOG_LEVEL_INFO=y
++_NAND_SKIP_BAD=y
+diff --git a/atf-20240117-bacca82a8/configs/mt7986_netcore_n60-pro_defconfig b/atf-20240117-bacca82a8/configs/mt7986_netcore_n60-pro_defconfig
+index d6210b619..61359e362 100644
+--- a/atf-20240117-bacca82a8/configs/mt7986_netcore_n60-pro_defconfig
++++ b/atf-20240117-bacca82a8/configs/mt7986_netcore_n60-pro_defconfig
+@@ -1,3 +1,4 @@
+ _PLAT_MT7986=y
+ _DRAM_DDR4=y
+ _LOG_LEVEL_INFO=y
++_NAND_SKIP_BAD=y
+diff --git a/atf-20240117-bacca82a8/configs/mt7986_netcore_n60_defconfig b/atf-20240117-bacca82a8/configs/mt7986_netcore_n60_defconfig
+index 6ebac72de..539c7290e 100644
+--- a/atf-20240117-bacca82a8/configs/mt7986_netcore_n60_defconfig
++++ b/atf-20240117-bacca82a8/configs/mt7986_netcore_n60_defconfig
+@@ -1,2 +1,3 @@
+ _PLAT_MT7986=y
+ _LOG_LEVEL_INFO=y
++_NAND_SKIP_BAD=y
+diff --git a/atf-20240117-bacca82a8/configs/mt7986_redmi_ax6000_defconfig b/atf-20240117-bacca82a8/configs/mt7986_redmi_ax6000_defconfig
+index d6210b619..61359e362 100644
+--- a/atf-20240117-bacca82a8/configs/mt7986_redmi_ax6000_defconfig
++++ b/atf-20240117-bacca82a8/configs/mt7986_redmi_ax6000_defconfig
+@@ -1,3 +1,4 @@
+ _PLAT_MT7986=y
+ _DRAM_DDR4=y
+ _LOG_LEVEL_INFO=y
++_NAND_SKIP_BAD=y
+diff --git a/build.sh b/build.sh
+index 58587117d..a160fe8f1 100755
+--- a/build.sh
++++ b/build.sh
+@@ -78,6 +78,7 @@ if [ "$fixedparts" = "1" ]; then
+ 	echo "CONFIG_MEDIATEK_UBI_FIXED_MTDPARTS=y" >> "$UBOOT_DIR/.config"
+ 	echo "CONFIG_MTK_FIXED_MTD_MTDPARTS=y" >> "$UBOOT_DIR/.config"
+ fi
++grep -q "CONFIG_ENV_VARS_UBOOT_CONFIG=y" "$UBOOT_DIR/.config" || echo "CONFIG_ENV_VARS_UBOOT_CONFIG=y" >> "$UBOOT_DIR/.config"
+ make -C "$UBOOT_DIR" olddefconfig
+ make -C "$UBOOT_DIR" clean
+ make -C "$UBOOT_DIR" -j $(nproc) all
+diff --git a/uboot-mtk-20220606/arch/arm/dts/mt7981-abt_asr3000.dts b/uboot-mtk-20220606/arch/arm/dts/mt7981-abt_asr3000.dts
+index 0ac936faf..c328a98cc 100644
+--- a/uboot-mtk-20220606/arch/arm/dts/mt7981-abt_asr3000.dts
++++ b/uboot-mtk-20220606/arch/arm/dts/mt7981-abt_asr3000.dts
+@@ -19,6 +19,10 @@
+ 		bootcmd = "mtkboardboot";
+ 		blink_led = "green:mesh";
+ 		system_led = "green:mesh";
++
++		environment {
++			bootargs = "root=/dev/fit0 rootwait";
++		};
+ 	};
+ 
+ 	gpio-keys {
+diff --git a/uboot-mtk-20220606/arch/arm/dts/mt7981-cetron_ct3003.dts b/uboot-mtk-20220606/arch/arm/dts/mt7981-cetron_ct3003.dts
+index e982ff9c5..657e354b9 100644
+--- a/uboot-mtk-20220606/arch/arm/dts/mt7981-cetron_ct3003.dts
++++ b/uboot-mtk-20220606/arch/arm/dts/mt7981-cetron_ct3003.dts
+@@ -19,6 +19,10 @@
+ 		bootcmd = "mtkboardboot";
+ 		blink_led = "red:status";
+ 		system_led = "green:status";
++
++		environment {
++			bootargs = "root=/dev/fit0 rootwait";
++		};
+ 	};
+ 
+ 	gpio-keys {
+diff --git a/uboot-mtk-20220606/arch/arm/dts/mt7981-cmcc-rax3000m-emmc.dts b/uboot-mtk-20220606/arch/arm/dts/mt7981-cmcc-rax3000m-emmc.dts
+index 91af59d1e..4f81d3a35 100644
+--- a/uboot-mtk-20220606/arch/arm/dts/mt7981-cmcc-rax3000m-emmc.dts
++++ b/uboot-mtk-20220606/arch/arm/dts/mt7981-cmcc-rax3000m-emmc.dts
+@@ -20,6 +20,11 @@
+ 		bootcmd = "mtkboardboot";
+ 		blink_led = "blue:status";
+ 		system_led = "red:status";
++
++		environment {
++			bootargs = "root=/dev/mmcblk0p65 rootwait";
++			bootconf = "config-1#mt7981b-cmcc-rax3000m-emmc";
++		};
+ 	};
+ 
+ 	memory@40000000 {
+diff --git a/uboot-mtk-20220606/arch/arm/dts/mt7981-cmcc-rax3000m.dts b/uboot-mtk-20220606/arch/arm/dts/mt7981-cmcc-rax3000m.dts
+index f7d49d87d..547f988f1 100644
+--- a/uboot-mtk-20220606/arch/arm/dts/mt7981-cmcc-rax3000m.dts
++++ b/uboot-mtk-20220606/arch/arm/dts/mt7981-cmcc-rax3000m.dts
+@@ -19,6 +19,10 @@
+ 		bootcmd = "mtkboardboot";
+ 		blink_led = "blue:system";
+ 		system_led = "green:system";
++
++		environment {
++			bootconf = "config-1#mt7981b-cmcc-rax3000m-nand";
++		};
+ 	};
+ 
+ 	gpio-keys {
+diff --git a/uboot-mtk-20220606/arch/arm/dts/mt7981-konka_komi-a31.dts b/uboot-mtk-20220606/arch/arm/dts/mt7981-konka_komi-a31.dts
+index 7f00c8fd4..385c521db 100644
+--- a/uboot-mtk-20220606/arch/arm/dts/mt7981-konka_komi-a31.dts
++++ b/uboot-mtk-20220606/arch/arm/dts/mt7981-konka_komi-a31.dts
+@@ -116,4 +116,4 @@
+ 
+ &watchdog {
+ 	status = "disabled";
+-};
+\ No newline at end of file
++};
+diff --git a/uboot-mtk-20220606/arch/arm/dts/mt7981-livinet_zr-3020.dts b/uboot-mtk-20220606/arch/arm/dts/mt7981-livinet_zr-3020.dts
+index 724c719ad..c8be8d432 100644
+--- a/uboot-mtk-20220606/arch/arm/dts/mt7981-livinet_zr-3020.dts
++++ b/uboot-mtk-20220606/arch/arm/dts/mt7981-livinet_zr-3020.dts
+@@ -17,6 +17,10 @@
+ 		bootcmd = "mtkboardboot";
+ 		blink_led = "red:d8";
+ 		system_led = "green:upgrade";
++
++		environment {
++			bootargs = "root=/dev/fit0 rootwait";
++		};
+ 	};
+ 
+ 	gpio-keys {
+diff --git a/uboot-mtk-20220606/arch/arm/dts/mt7981-nokia-ea0326gmp.dts b/uboot-mtk-20220606/arch/arm/dts/mt7981-nokia-ea0326gmp.dts
+index a42caaf7a..78acddda9 100644
+--- a/uboot-mtk-20220606/arch/arm/dts/mt7981-nokia-ea0326gmp.dts
++++ b/uboot-mtk-20220606/arch/arm/dts/mt7981-nokia-ea0326gmp.dts
+@@ -19,6 +19,10 @@
+ 		bootcmd = "mtkboardboot";
+ 		blink_led = "green:power";
+ 		system_led = "green:power";
++
++		environment {
++			bootargs = "root=/dev/fit0 rootwait";
++		};
+ 	};
+ 
+ 	gpio-keys {
+diff --git a/uboot-mtk-20220606/arch/arm/dts/mt7986a-jdcloud_re-cp-03.dts b/uboot-mtk-20220606/arch/arm/dts/mt7986a-jdcloud_re-cp-03.dts
+index 905f0ea9d..b83b13509 100644
+--- a/uboot-mtk-20220606/arch/arm/dts/mt7986a-jdcloud_re-cp-03.dts
++++ b/uboot-mtk-20220606/arch/arm/dts/mt7986a-jdcloud_re-cp-03.dts
+@@ -20,6 +20,10 @@
+ 		bootcmd = "mtkboardboot";
+ 		blink_led = "blue:status";
+ 		system_led = "red:status";
++
++		environment {
++			bootargs = "root=/dev/mmcblk0p65 rootwait";
++		};
+ 	};
+ 
+ 	gpio-keys {
+diff --git a/uboot-mtk-20220606/board/mediatek/common/ubi_helper.c b/uboot-mtk-20220606/board/mediatek/common/ubi_helper.c
+index e8725b936..d1b4ebb10 100644
+--- a/uboot-mtk-20220606/board/mediatek/common/ubi_helper.c
++++ b/uboot-mtk-20220606/board/mediatek/common/ubi_helper.c
+@@ -532,9 +532,9 @@ static int boot_from_ubi(struct mtd_info *mtd)
+ 	if (ret)
+ 		return ret;
+ 
+-	ret = read_ubi_volume("kernel", (void *)data_load_addr, 0);
++	ret = read_ubi_volume("fit", (void *)data_load_addr, 0);
+ 	if (ret == -ENODEV)
+-		ret = read_ubi_volume("fit", (void *)data_load_addr, 0);
++		ret = read_ubi_volume("kernel", (void *)data_load_addr, 0);
+ 	if (ret)
+ 		return ret;
+ 
+diff --git a/uboot-mtk-20220606/board/mediatek/mt7622/bootmenu_emmc.c b/uboot-mtk-20220606/board/mediatek/mt7622/bootmenu_emmc.c
+index 1df848b9d..5d1bdb9e2 100644
+--- a/uboot-mtk-20220606/board/mediatek/mt7622/bootmenu_emmc.c
++++ b/uboot-mtk-20220606/board/mediatek/mt7622/bootmenu_emmc.c
+@@ -291,9 +291,9 @@ int board_boot_default(void)
+ #else
+ 	int ret;
+ 
+-	ret = boot_from_mmc_partition(EMMC_DEV_INDEX, 0, PART_KERNEL_NAME);
++	ret = boot_from_mmc_partition(EMMC_DEV_INDEX, 0, PART_PRODUCTION_NAME);
+ 	if (ret == -ENODEV)
+-		return boot_from_mmc_partition(EMMC_DEV_INDEX, 0, PART_PRODUCTION_NAME);
++		return boot_from_mmc_partition(EMMC_DEV_INDEX, 0, PART_KERNEL_NAME);
+ 
+ 	return ret;
+ #endif /* CONFIG_MTK_DUAL_BOOT */
+diff --git a/uboot-mtk-20220606/board/mediatek/mt7981/bootmenu_emmc.c b/uboot-mtk-20220606/board/mediatek/mt7981/bootmenu_emmc.c
+index 1df848b9d..5d1bdb9e2 100644
+--- a/uboot-mtk-20220606/board/mediatek/mt7981/bootmenu_emmc.c
++++ b/uboot-mtk-20220606/board/mediatek/mt7981/bootmenu_emmc.c
+@@ -291,9 +291,9 @@ int board_boot_default(void)
+ #else
+ 	int ret;
+ 
+-	ret = boot_from_mmc_partition(EMMC_DEV_INDEX, 0, PART_KERNEL_NAME);
++	ret = boot_from_mmc_partition(EMMC_DEV_INDEX, 0, PART_PRODUCTION_NAME);
+ 	if (ret == -ENODEV)
+-		return boot_from_mmc_partition(EMMC_DEV_INDEX, 0, PART_PRODUCTION_NAME);
++		return boot_from_mmc_partition(EMMC_DEV_INDEX, 0, PART_KERNEL_NAME);
+ 
+ 	return ret;
+ #endif /* CONFIG_MTK_DUAL_BOOT */
+diff --git a/uboot-mtk-20220606/board/mediatek/mt7986/bootmenu_emmc.c b/uboot-mtk-20220606/board/mediatek/mt7986/bootmenu_emmc.c
+index 1df848b9d..5d1bdb9e2 100644
+--- a/uboot-mtk-20220606/board/mediatek/mt7986/bootmenu_emmc.c
++++ b/uboot-mtk-20220606/board/mediatek/mt7986/bootmenu_emmc.c
+@@ -291,9 +291,9 @@ int board_boot_default(void)
+ #else
+ 	int ret;
+ 
+-	ret = boot_from_mmc_partition(EMMC_DEV_INDEX, 0, PART_KERNEL_NAME);
++	ret = boot_from_mmc_partition(EMMC_DEV_INDEX, 0, PART_PRODUCTION_NAME);
+ 	if (ret == -ENODEV)
+-		return boot_from_mmc_partition(EMMC_DEV_INDEX, 0, PART_PRODUCTION_NAME);
++		return boot_from_mmc_partition(EMMC_DEV_INDEX, 0, PART_KERNEL_NAME);
+ 
+ 	return ret;
+ #endif /* CONFIG_MTK_DUAL_BOOT */
+diff --git a/uboot-mtk-20220606/board/mediatek/mt7988/bootmenu_emmc.c b/uboot-mtk-20220606/board/mediatek/mt7988/bootmenu_emmc.c
+index 1df848b9d..5d1bdb9e2 100644
+--- a/uboot-mtk-20220606/board/mediatek/mt7988/bootmenu_emmc.c
++++ b/uboot-mtk-20220606/board/mediatek/mt7988/bootmenu_emmc.c
+@@ -291,9 +291,9 @@ int board_boot_default(void)
+ #else
+ 	int ret;
+ 
+-	ret = boot_from_mmc_partition(EMMC_DEV_INDEX, 0, PART_KERNEL_NAME);
++	ret = boot_from_mmc_partition(EMMC_DEV_INDEX, 0, PART_PRODUCTION_NAME);
+ 	if (ret == -ENODEV)
+-		return boot_from_mmc_partition(EMMC_DEV_INDEX, 0, PART_PRODUCTION_NAME);
++		return boot_from_mmc_partition(EMMC_DEV_INDEX, 0, PART_KERNEL_NAME);
+ 
+ 	return ret;
+ #endif /* CONFIG_MTK_DUAL_BOOT */
+diff --git a/uboot-mtk-20220606/configs/mt7981_360t7_defconfig b/uboot-mtk-20220606/configs/mt7981_360t7_defconfig
+index 77e1758d1..784c79a21 100644
+--- a/uboot-mtk-20220606/configs/mt7981_360t7_defconfig
++++ b/uboot-mtk-20220606/configs/mt7981_360t7_defconfig
+@@ -4,11 +4,8 @@ CONFIG_ARCH_MEDIATEK=y
+ CONFIG_SYS_TEXT_BASE=0x41e00000
+ CONFIG_SYS_MALLOC_F_LEN=0x4000
+ CONFIG_NR_DRAM_BANKS=1
+-CONFIG_ENV_SIZE=0x20000
+-CONFIG_ENV_OFFSET=0x100000
+ CONFIG_DEFAULT_DEVICE_TREE="mt7981-360t7"
+ CONFIG_TARGET_MT7981=y
+-CONFIG_ENABLE_NAND_NMBM=y
+ CONFIG_MEDIATEK_BOOTMENU=y
+ CONFIG_MEDIATEK_BOOTMENU_DELAY=3
+ CONFIG_MEDIATEK_LOAD_FROM_RAM=y
+@@ -38,24 +35,26 @@ CONFIG_CMD_GPIO=y
+ CONFIG_CMD_GPIO_READ=y
+ CONFIG_CMD_MTD=y
+ # CONFIG_CMD_NAND_EXT is not set
+-CONFIG_CMD_NMBM=y
+ CONFIG_CMD_TFTPPUT=y
+ # CONFIG_CMD_NFS is not set
+ CONFIG_CMD_PING=y
+ CONFIG_CMD_LED_BLINK=y
+ CONFIG_CMD_SMC=y
+ CONFIG_CMD_MTDPARTS=y
+-CONFIG_MTDIDS_DEFAULT="nmbm0=nmbm0"
+-CONFIG_MTDPARTS_DEFAULT="nmbm0:1024k(bl2),512k(u-boot-env),2048k(factory),2048k(fip),108M(ubi),1M(stock-config),512k(stock-factory),4M(stock-log)"
++CONFIG_MTDIDS_DEFAULT="spi-nand0=spi-nand0"
++CONFIG_MTDPARTS_DEFAULT="spi-nand0:1024k(bl2),512k(u-boot-env),2048k(factory),2048k(fip),110592k(ubi),1024k(stock-config),512k(stock-factory),4096k(stock-log)"
+ CONFIG_CMD_UBI=y
+ CONFIG_CMD_GL_BTN=y
+ CONFIG_OF_EMBED=y
+ CONFIG_ENV_OVERWRITE=y
+-CONFIG_ENV_IS_IN_MTD=y
+-CONFIG_ENV_MTD_NAME="nmbm0"
+-CONFIG_ENV_SIZE_REDUND=0x80000
++CONFIG_ENV_IS_IN_UBI=y
++CONFIG_SYS_REDUNDAND_ENVIRONMENT=y
++CONFIG_ENV_UBI_PART="ubi"
++CONFIG_ENV_UBI_VOLUME="ubootenv"
++CONFIG_ENV_UBI_VOLUME_REDUND="ubootenv2"
+ CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG=y
+ CONFIG_NET_RANDOM_ETHADDR=y
++CONFIG_NET_FORCE_IPADDR=y
+ CONFIG_REGMAP=y
+ CONFIG_SYSCON=y
+ CONFIG_BUTTON=y
+diff --git a/uboot-mtk-20220606/configs/mt7981_abt_asr3000_defconfig b/uboot-mtk-20220606/configs/mt7981_abt_asr3000_defconfig
+index 2732f3973..1633248cc 100644
+--- a/uboot-mtk-20220606/configs/mt7981_abt_asr3000_defconfig
++++ b/uboot-mtk-20220606/configs/mt7981_abt_asr3000_defconfig
+@@ -8,7 +8,6 @@ CONFIG_ENV_SIZE=0x20000
+ CONFIG_ENV_OFFSET=0x100000
+ CONFIG_DEFAULT_DEVICE_TREE="mt7981-abt_asr3000"
+ CONFIG_TARGET_MT7981=y
+-CONFIG_ENABLE_NAND_NMBM=y
+ CONFIG_MEDIATEK_BOOTMENU=y
+ CONFIG_MEDIATEK_BOOTMENU_DELAY=3
+ CONFIG_MEDIATEK_LOAD_FROM_RAM=y
+@@ -17,6 +16,7 @@ CONFIG_DEBUG_UART_BASE=0x11002000
+ CONFIG_DEBUG_UART_CLOCK=40000000
+ CONFIG_SYS_LOAD_ADDR=0x46000000
+ CONFIG_DEBUG_UART=y
++CONFIG_ENV_VARS_UBOOT_CONFIG=y
+ CONFIG_BOOTDELAY=3
+ CONFIG_AUTOBOOT_MENU_SHOW=y
+ CONFIG_AUTOBOOT_MENU_MTK_SHOW=y
+@@ -38,24 +38,27 @@ CONFIG_CMD_GPIO=y
+ CONFIG_CMD_GPIO_READ=y
+ CONFIG_CMD_MTD=y
+ # CONFIG_CMD_NAND_EXT is not set
+-CONFIG_CMD_NMBM=y
+ CONFIG_CMD_TFTPPUT=y
+ # CONFIG_CMD_NFS is not set
+ CONFIG_CMD_PING=y
+ CONFIG_CMD_LED_BLINK=y
+ CONFIG_CMD_SMC=y
+ CONFIG_CMD_MTDPARTS=y
+-CONFIG_MTDIDS_DEFAULT="nmbm0=nmbm0"
+-CONFIG_MTDPARTS_DEFAULT="nmbm0:1024k(bl2),512k(u-boot-env),1024k(art),1024k(Factory),2048k(fip),113152k(ubi)"
++CONFIG_MTDIDS_DEFAULT="spi-nand0=spi-nand0"
++CONFIG_MTDPARTS_DEFAULT="spi-nand0:1024k(bl2),512k(u-boot-env),1024k(art),1024k(factory),2048k(fip),125440k(ubi)"
+ CONFIG_CMD_UBI=y
+ CONFIG_CMD_GL_BTN=y
+ CONFIG_OF_EMBED=y
+ CONFIG_ENV_OVERWRITE=y
+-CONFIG_ENV_IS_IN_MTD=y
+-CONFIG_ENV_MTD_NAME="nmbm0"
+-CONFIG_ENV_SIZE_REDUND=0x80000
++CONFIG_ENV_IS_IN_UBI=y
++CONFIG_SYS_REDUNDAND_ENVIRONMENT=y
++CONFIG_ENV_UBI_PART="ubi"
++CONFIG_ENV_UBI_VOLUME="ubootenv"
++CONFIG_ENV_UBI_VOLUME_REDUND="ubootenv2"
+ CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG=y
++CONFIG_ENV_IMPORT_FDT=y
+ CONFIG_NET_RANDOM_ETHADDR=y
++CONFIG_NET_FORCE_IPADDR=y
+ CONFIG_REGMAP=y
+ CONFIG_SYSCON=y
+ CONFIG_BUTTON=y
+diff --git a/uboot-mtk-20220606/configs/mt7981_ax3000t_an8855_defconfig b/uboot-mtk-20220606/configs/mt7981_ax3000t_an8855_defconfig
+index 1b4bc7609..114b7de8a 100644
+--- a/uboot-mtk-20220606/configs/mt7981_ax3000t_an8855_defconfig
++++ b/uboot-mtk-20220606/configs/mt7981_ax3000t_an8855_defconfig
+@@ -4,11 +4,8 @@ CONFIG_ARCH_MEDIATEK=y
+ CONFIG_SYS_TEXT_BASE=0x41e00000
+ CONFIG_SYS_MALLOC_F_LEN=0x4000
+ CONFIG_NR_DRAM_BANKS=1
+-CONFIG_ENV_SIZE=0x10000
+-CONFIG_ENV_OFFSET=0x100000
+ CONFIG_DEFAULT_DEVICE_TREE="mt7981-ax3000t-an8855"
+ CONFIG_TARGET_MT7981=y
+-CONFIG_ENABLE_NAND_NMBM=y
+ CONFIG_MEDIATEK_BOOTMENU=y
+ CONFIG_MEDIATEK_BOOTMENU_DELAY=3
+ CONFIG_MEDIATEK_LOAD_FROM_RAM=y
+@@ -38,23 +35,23 @@ CONFIG_CMD_GPIO=y
+ CONFIG_CMD_GPIO_READ=y
+ CONFIG_CMD_MTD=y
+ # CONFIG_CMD_NAND_EXT is not set
+-CONFIG_CMD_NMBM=y
+ CONFIG_CMD_TFTPPUT=y
+ # CONFIG_CMD_NFS is not set
+ CONFIG_CMD_PING=y
+ CONFIG_CMD_LED_BLINK=y
+ CONFIG_CMD_SMC=y
+ CONFIG_CMD_MTDPARTS=y
+-CONFIG_MTDIDS_DEFAULT="nmbm0=nmbm0"
+-CONFIG_MTDPARTS_DEFAULT="nmbm0:1024k(bl2),256k(Nvram),256k(Bdata),2048k(factory),2048k(fip),256k(crash),256k(crash_log),112m(ubi),256k(KF)"
++CONFIG_MTDIDS_DEFAULT="spi-nand0=spi-nand0"
++CONFIG_MTDPARTS_DEFAULT="spi-nand0:1024k(bl2),256k(Nvram),256k(Bdata),2048k(factory),2048k(fip),256k(crash),256k(crash_log),114688k(ubi),256k(KF)"
+ CONFIG_CMD_UBI=y
+ CONFIG_CMD_GL_BTN=y
+-CONFIG_CMD_SHOW_MTD_LAYOUT=y
+ CONFIG_OF_EMBED=y
+ CONFIG_ENV_OVERWRITE=y
+-CONFIG_ENV_IS_IN_MTD=y
+-CONFIG_ENV_MTD_NAME="nmbm0"
+-CONFIG_ENV_SIZE_REDUND=0x80000
++CONFIG_ENV_IS_IN_UBI=y
++CONFIG_SYS_REDUNDAND_ENVIRONMENT=y
++CONFIG_ENV_UBI_PART="ubi"
++CONFIG_ENV_UBI_VOLUME="ubootenv"
++CONFIG_ENV_UBI_VOLUME_REDUND="ubootenv2"
+ CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG=y
+ CONFIG_NET_RANDOM_ETHADDR=y
+ CONFIG_NET_FORCE_IPADDR=y
+diff --git a/uboot-mtk-20220606/configs/mt7981_ax3000t_defconfig b/uboot-mtk-20220606/configs/mt7981_ax3000t_defconfig
+index 74b256cb9..761162304 100644
+--- a/uboot-mtk-20220606/configs/mt7981_ax3000t_defconfig
++++ b/uboot-mtk-20220606/configs/mt7981_ax3000t_defconfig
+@@ -4,11 +4,8 @@ CONFIG_ARCH_MEDIATEK=y
+ CONFIG_SYS_TEXT_BASE=0x41e00000
+ CONFIG_SYS_MALLOC_F_LEN=0x4000
+ CONFIG_NR_DRAM_BANKS=1
+-CONFIG_ENV_SIZE=0x10000
+-CONFIG_ENV_OFFSET=0x100000
+ CONFIG_DEFAULT_DEVICE_TREE="mt7981-ax3000t"
+ CONFIG_TARGET_MT7981=y
+-CONFIG_ENABLE_NAND_NMBM=y
+ CONFIG_MEDIATEK_BOOTMENU=y
+ CONFIG_MEDIATEK_BOOTMENU_DELAY=3
+ CONFIG_MEDIATEK_LOAD_FROM_RAM=y
+@@ -38,23 +35,23 @@ CONFIG_CMD_GPIO=y
+ CONFIG_CMD_GPIO_READ=y
+ CONFIG_CMD_MTD=y
+ # CONFIG_CMD_NAND_EXT is not set
+-CONFIG_CMD_NMBM=y
+ CONFIG_CMD_TFTPPUT=y
+ # CONFIG_CMD_NFS is not set
+ CONFIG_CMD_PING=y
+ CONFIG_CMD_LED_BLINK=y
+ CONFIG_CMD_SMC=y
+ CONFIG_CMD_MTDPARTS=y
+-CONFIG_MTDIDS_DEFAULT="nmbm0=nmbm0"
+-CONFIG_MTDPARTS_DEFAULT="nmbm0:1024k(bl2),256k(Nvram),256k(Bdata),2048k(factory),2048k(fip),256k(crash),256k(crash_log),112m(ubi),256k(KF)"
++CONFIG_MTDIDS_DEFAULT="spi-nand0=spi-nand0"
++CONFIG_MTDPARTS_DEFAULT="spi-nand0:1024k(bl2),256k(Nvram),256k(Bdata),2048k(factory),2048k(fip),256k(crash),256k(crash_log),114688k(ubi),256k(KF)"
+ CONFIG_CMD_UBI=y
+ CONFIG_CMD_GL_BTN=y
+-CONFIG_CMD_SHOW_MTD_LAYOUT=y
+ CONFIG_OF_EMBED=y
+ CONFIG_ENV_OVERWRITE=y
+-CONFIG_ENV_IS_IN_MTD=y
+-CONFIG_ENV_MTD_NAME="nmbm0"
+-CONFIG_ENV_SIZE_REDUND=0x80000
++CONFIG_ENV_IS_IN_UBI=y
++CONFIG_SYS_REDUNDAND_ENVIRONMENT=y
++CONFIG_ENV_UBI_PART="ubi"
++CONFIG_ENV_UBI_VOLUME="ubootenv"
++CONFIG_ENV_UBI_VOLUME_REDUND="ubootenv2"
+ CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG=y
+ CONFIG_NET_RANDOM_ETHADDR=y
+ CONFIG_NET_FORCE_IPADDR=y
+diff --git a/uboot-mtk-20220606/configs/mt7981_cetron_ct3003_defconfig b/uboot-mtk-20220606/configs/mt7981_cetron_ct3003_defconfig
+index 60031110c..1a1806821 100644
+--- a/uboot-mtk-20220606/configs/mt7981_cetron_ct3003_defconfig
++++ b/uboot-mtk-20220606/configs/mt7981_cetron_ct3003_defconfig
+@@ -4,11 +4,8 @@ CONFIG_ARCH_MEDIATEK=y
+ CONFIG_SYS_TEXT_BASE=0x41e00000
+ CONFIG_SYS_MALLOC_F_LEN=0x4000
+ CONFIG_NR_DRAM_BANKS=1
+-CONFIG_ENV_SIZE=0x20000
+-CONFIG_ENV_OFFSET=0x100000
+ CONFIG_DEFAULT_DEVICE_TREE="mt7981-cetron_ct3003"
+ CONFIG_TARGET_MT7981=y
+-CONFIG_ENABLE_NAND_NMBM=y
+ CONFIG_MEDIATEK_BOOTMENU=y
+ CONFIG_MEDIATEK_BOOTMENU_DELAY=3
+ CONFIG_MEDIATEK_LOAD_FROM_RAM=y
+@@ -17,6 +14,7 @@ CONFIG_DEBUG_UART_BASE=0x11002000
+ CONFIG_DEBUG_UART_CLOCK=40000000
+ CONFIG_SYS_LOAD_ADDR=0x46000000
+ CONFIG_DEBUG_UART=y
++CONFIG_ENV_VARS_UBOOT_CONFIG=y
+ CONFIG_BOOTDELAY=3
+ CONFIG_AUTOBOOT_MENU_SHOW=y
+ CONFIG_AUTOBOOT_MENU_MTK_SHOW=y
+@@ -38,24 +36,27 @@ CONFIG_CMD_GPIO=y
+ CONFIG_CMD_GPIO_READ=y
+ CONFIG_CMD_MTD=y
+ # CONFIG_CMD_NAND_EXT is not set
+-CONFIG_CMD_NMBM=y
+ CONFIG_CMD_TFTPPUT=y
+ # CONFIG_CMD_NFS is not set
+ CONFIG_CMD_PING=y
+ CONFIG_CMD_LED_BLINK=y
+ CONFIG_CMD_SMC=y
+ CONFIG_CMD_MTDPARTS=y
+-CONFIG_MTDIDS_DEFAULT="nmbm0=nmbm0"
+-CONFIG_MTDPARTS_DEFAULT="nmbm0:1024k(bl2),512k(u-boot-env),1024k(art),1024k(Factory),2048k(fip),113152k(ubi)"
++CONFIG_MTDIDS_DEFAULT="spi-nand0=spi-nand0"
++CONFIG_MTDPARTS_DEFAULT="spi-nand0:1024k(bl2),512k(u-boot-env),1024k(art),1024k(factory),2048k(fip),125440k(ubi)"
+ CONFIG_CMD_UBI=y
+ CONFIG_CMD_GL_BTN=y
+ CONFIG_OF_EMBED=y
+ CONFIG_ENV_OVERWRITE=y
+-CONFIG_ENV_IS_IN_MTD=y
+-CONFIG_ENV_MTD_NAME="nmbm0"
+-CONFIG_ENV_SIZE_REDUND=0x80000
++CONFIG_ENV_IS_IN_UBI=y
++CONFIG_SYS_REDUNDAND_ENVIRONMENT=y
++CONFIG_ENV_UBI_PART="ubi"
++CONFIG_ENV_UBI_VOLUME="ubootenv"
++CONFIG_ENV_UBI_VOLUME_REDUND="ubootenv2"
+ CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG=y
++CONFIG_ENV_IMPORT_FDT=y
+ CONFIG_NET_RANDOM_ETHADDR=y
++CONFIG_NET_FORCE_IPADDR=y
+ CONFIG_REGMAP=y
+ CONFIG_SYSCON=y
+ CONFIG_BUTTON=y
+diff --git a/uboot-mtk-20220606/configs/mt7981_cmcc_a10_defconfig b/uboot-mtk-20220606/configs/mt7981_cmcc_a10_defconfig
+index 955d70b22..6c72bfccc 100644
+--- a/uboot-mtk-20220606/configs/mt7981_cmcc_a10_defconfig
++++ b/uboot-mtk-20220606/configs/mt7981_cmcc_a10_defconfig
+@@ -4,11 +4,8 @@ CONFIG_ARCH_MEDIATEK=y
+ CONFIG_SYS_TEXT_BASE=0x41e00000
+ CONFIG_SYS_MALLOC_F_LEN=0x4000
+ CONFIG_NR_DRAM_BANKS=1
+-CONFIG_ENV_SIZE=0x20000
+-CONFIG_ENV_OFFSET=0x100000
+ CONFIG_DEFAULT_DEVICE_TREE="mt7981-cmcc_a10"
+ CONFIG_TARGET_MT7981=y
+-CONFIG_ENABLE_NAND_NMBM=y
+ CONFIG_MEDIATEK_BOOTMENU=y
+ CONFIG_MEDIATEK_BOOTMENU_DELAY=3
+ CONFIG_MEDIATEK_LOAD_FROM_RAM=y
+@@ -17,6 +14,7 @@ CONFIG_DEBUG_UART_BASE=0x11002000
+ CONFIG_DEBUG_UART_CLOCK=40000000
+ CONFIG_SYS_LOAD_ADDR=0x46000000
+ CONFIG_DEBUG_UART=y
++CONFIG_ENV_VARS_UBOOT_CONFIG=y
+ CONFIG_BOOTDELAY=3
+ CONFIG_AUTOBOOT_MENU_SHOW=y
+ CONFIG_AUTOBOOT_MENU_MTK_SHOW=y
+@@ -38,25 +36,27 @@ CONFIG_CMD_GPIO=y
+ CONFIG_CMD_GPIO_READ=y
+ CONFIG_CMD_MTD=y
+ # CONFIG_CMD_NAND_EXT is not set
+-CONFIG_CMD_NMBM=y
+ CONFIG_CMD_TFTPPUT=y
+ # CONFIG_CMD_NFS is not set
+ CONFIG_CMD_PING=y
+ CONFIG_CMD_LED_BLINK=y
+ CONFIG_CMD_SMC=y
+ CONFIG_CMD_MTDPARTS=y
+-CONFIG_MTDIDS_DEFAULT="nmbm0=nmbm0"
+-CONFIG_MTDPARTS_DEFAULT="nmbm0:1024k(bl2),512k(u-boot-env),2048k(Factory),2048k(fip),114688k(ubi)"
++CONFIG_MTDIDS_DEFAULT="spi-nand0=spi-nand0"
++CONFIG_MTDPARTS_DEFAULT="spi-nand0:1024k(bl2),512k(u-boot-env),2048k(Factory),2048k(fip),125440k(ubi)"
+ CONFIG_CMD_UBI=y
+ CONFIG_CMD_GL_BTN=y
+-CONFIG_CMD_SHOW_MTD_LAYOUT=y
+ CONFIG_OF_EMBED=y
+ CONFIG_ENV_OVERWRITE=y
+-CONFIG_ENV_IS_IN_MTD=y
+-CONFIG_ENV_MTD_NAME="nmbm0"
+-CONFIG_ENV_SIZE_REDUND=0x80000
++CONFIG_ENV_IS_IN_UBI=y
++CONFIG_SYS_REDUNDAND_ENVIRONMENT=y
++CONFIG_ENV_UBI_PART="ubi"
++CONFIG_ENV_UBI_VOLUME="ubootenv"
++CONFIG_ENV_UBI_VOLUME_REDUND="ubootenv2"
+ CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG=y
++CONFIG_ENV_IMPORT_FDT=y
+ CONFIG_NET_RANDOM_ETHADDR=y
++CONFIG_NET_FORCE_IPADDR=y
+ CONFIG_REGMAP=y
+ CONFIG_SYSCON=y
+ CONFIG_BUTTON=y
+@@ -88,4 +88,4 @@ CONFIG_TIMER=y
+ CONFIG_MTK_TIMER=y
+ CONFIG_HEXDUMP=y
+ CONFIG_WEBUI_FAILSAFE=y
+-CONFIG_WEBUI_FAILSAFE_ON_AUTOBOOT_FAIL=y
++CONFIG_WEBUI_FAILSAFE_ON_AUTOBOOT_FAIL=y
+\ No newline at end of file
+diff --git a/uboot-mtk-20220606/configs/mt7981_cmcc_rax3000m-emmc_defconfig b/uboot-mtk-20220606/configs/mt7981_cmcc_rax3000m-emmc_defconfig
+index 649702e92..9e73d7d28 100644
+--- a/uboot-mtk-20220606/configs/mt7981_cmcc_rax3000m-emmc_defconfig
++++ b/uboot-mtk-20220606/configs/mt7981_cmcc_rax3000m-emmc_defconfig
+@@ -4,7 +4,7 @@ CONFIG_ARCH_MEDIATEK=y
+ CONFIG_SYS_TEXT_BASE=0x41e00000
+ CONFIG_SYS_MALLOC_F_LEN=0x4000
+ CONFIG_NR_DRAM_BANKS=1
+-CONFIG_ENV_SIZE=0x80000
++CONFIG_ENV_SIZE=0x40000
+ CONFIG_ENV_OFFSET=0x400000
+ CONFIG_DEFAULT_DEVICE_TREE="mt7981-cmcc-rax3000m-emmc"
+ CONFIG_TARGET_MT7981=y
+@@ -15,6 +15,7 @@ CONFIG_MEDIATEK_LOAD_FROM_RAM=y
+ CONFIG_MT7981_BOOTMENU_EMMC=y
+ CONFIG_DEBUG_UART_BASE=0x11002000
+ CONFIG_DEBUG_UART_CLOCK=40000000
++CONFIG_ENV_OFFSET_REDUND=0x440000
+ CONFIG_DEBUG_UART=y
+ CONFIG_BOOTDELAY=3
+ CONFIG_SYS_LOAD_ADDR=0x46000000
+@@ -45,8 +46,10 @@ CONFIG_PARTITION_TYPE_GUID=y
+ CONFIG_OF_EMBED=y
+ CONFIG_ENV_OVERWRITE=y
+ CONFIG_ENV_IS_IN_MMC=y
++CONFIG_SYS_REDUNDAND_ENVIRONMENT=y
+ CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG=y
+ CONFIG_NET_RANDOM_ETHADDR=y
++CONFIG_NET_FORCE_IPADDR=y
+ CONFIG_REGMAP=y
+ CONFIG_SYSCON=y
+ CONFIG_CLK=y
+@@ -77,6 +80,7 @@ CONFIG_TIMER=y
+ CONFIG_MTK_TIMER=y
+ CONFIG_LZO=y
+ CONFIG_HEXDUMP=y
++CONFIG_OF_LIBFDT_OVERLAY=y
+ CONFIG_CMD_GL_BTN=y
+ CONFIG_BUTTON=y
+ CONFIG_BUTTON_GPIO=y
+diff --git a/uboot-mtk-20220606/configs/mt7981_cmcc_rax3000m_defconfig b/uboot-mtk-20220606/configs/mt7981_cmcc_rax3000m_defconfig
+index ebb221855..2f7f74ac7 100644
+--- a/uboot-mtk-20220606/configs/mt7981_cmcc_rax3000m_defconfig
++++ b/uboot-mtk-20220606/configs/mt7981_cmcc_rax3000m_defconfig
+@@ -4,11 +4,8 @@ CONFIG_ARCH_MEDIATEK=y
+ CONFIG_SYS_TEXT_BASE=0x41e00000
+ CONFIG_SYS_MALLOC_F_LEN=0x4000
+ CONFIG_NR_DRAM_BANKS=1
+-CONFIG_ENV_SIZE=0x80000
+-CONFIG_ENV_OFFSET=0x100000
+ CONFIG_DEFAULT_DEVICE_TREE="mt7981-cmcc-rax3000m"
+ CONFIG_TARGET_MT7981=y
+-CONFIG_ENABLE_NAND_NMBM=y
+ CONFIG_MEDIATEK_BOOTMENU=y
+ CONFIG_MEDIATEK_BOOTMENU_DELAY=3
+ CONFIG_MEDIATEK_LOAD_FROM_RAM=y
+@@ -17,6 +14,7 @@ CONFIG_DEBUG_UART_BASE=0x11002000
+ CONFIG_DEBUG_UART_CLOCK=40000000
+ CONFIG_SYS_LOAD_ADDR=0x46000000
+ CONFIG_DEBUG_UART=y
++CONFIG_ENV_VARS_UBOOT_CONFIG=y
+ CONFIG_BOOTDELAY=3
+ CONFIG_AUTOBOOT_MENU_SHOW=y
+ CONFIG_AUTOBOOT_MENU_MTK_SHOW=y
+@@ -38,24 +36,27 @@ CONFIG_CMD_GPIO=y
+ CONFIG_CMD_GPIO_READ=y
+ CONFIG_CMD_MTD=y
+ # CONFIG_CMD_NAND_EXT is not set
+-CONFIG_CMD_NMBM=y
+ CONFIG_CMD_TFTPPUT=y
+ # CONFIG_CMD_NFS is not set
+ CONFIG_CMD_PING=y
+ CONFIG_CMD_LED_BLINK=y
+ CONFIG_CMD_SMC=y
+ CONFIG_CMD_MTDPARTS=y
+-CONFIG_MTDIDS_DEFAULT="nmbm0=nmbm0"
+-CONFIG_MTDPARTS_DEFAULT="nmbm0:1024k(bl2),512k(u-boot-env),2048k(factory),2048k(fip),114M(ubi)"
++CONFIG_MTDIDS_DEFAULT="spi-nand0=spi-nand0"
++CONFIG_MTDPARTS_DEFAULT="spi-nand0:1024k(bl2),512k(u-boot-env),2048k(factory),2048k(fip),116736k(ubi)"
+ CONFIG_CMD_UBI=y
+ CONFIG_CMD_GL_BTN=y
+ CONFIG_OF_EMBED=y
+ CONFIG_ENV_OVERWRITE=y
+-CONFIG_ENV_IS_IN_MTD=y
+-CONFIG_ENV_MTD_NAME="nmbm0"
+-CONFIG_ENV_SIZE_REDUND=0x80000
++CONFIG_ENV_IS_IN_UBI=y
++CONFIG_SYS_REDUNDAND_ENVIRONMENT=y
++CONFIG_ENV_UBI_PART="ubi"
++CONFIG_ENV_UBI_VOLUME="ubootenv"
++CONFIG_ENV_UBI_VOLUME_REDUND="ubootenv2"
+ CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG=y
++CONFIG_ENV_IMPORT_FDT=y
+ CONFIG_NET_RANDOM_ETHADDR=y
++CONFIG_NET_FORCE_IPADDR=y
+ CONFIG_REGMAP=y
+ CONFIG_SYSCON=y
+ CONFIG_BUTTON=y
+@@ -86,5 +87,6 @@ CONFIG_MTK_SPIM=y
+ CONFIG_TIMER=y
+ CONFIG_MTK_TIMER=y
+ CONFIG_HEXDUMP=y
++CONFIG_OF_LIBFDT_OVERLAY=y
+ CONFIG_WEBUI_FAILSAFE=y
+ CONFIG_WEBUI_FAILSAFE_ON_AUTOBOOT_FAIL=y
+diff --git a/uboot-mtk-20220606/configs/mt7981_cudy_tr3000-v1_defconfig b/uboot-mtk-20220606/configs/mt7981_cudy_tr3000-v1_defconfig
+index 49b211a7d..d70b81997 100644
+--- a/uboot-mtk-20220606/configs/mt7981_cudy_tr3000-v1_defconfig
++++ b/uboot-mtk-20220606/configs/mt7981_cudy_tr3000-v1_defconfig
+@@ -4,11 +4,8 @@ CONFIG_ARCH_MEDIATEK=y
+ CONFIG_SYS_TEXT_BASE=0x41e00000
+ CONFIG_SYS_MALLOC_F_LEN=0x4000
+ CONFIG_NR_DRAM_BANKS=1
+-CONFIG_ENV_SIZE=0x20000
+-CONFIG_ENV_OFFSET=0x100000
+ CONFIG_DEFAULT_DEVICE_TREE="mt7981-cudy-tr3000-v1"
+ CONFIG_TARGET_MT7981=y
+-CONFIG_ENABLE_NAND_NMBM=y
+ CONFIG_MEDIATEK_BOOTMENU=y
+ CONFIG_MEDIATEK_BOOTMENU_DELAY=3
+ CONFIG_MEDIATEK_LOAD_FROM_RAM=y
+@@ -45,17 +42,20 @@ CONFIG_CMD_PING=y
+ CONFIG_CMD_LED_BLINK=y
+ CONFIG_CMD_SMC=y
+ CONFIG_CMD_MTDPARTS=y
+-CONFIG_MTDIDS_DEFAULT="nmbm0=nmbm0"
+-CONFIG_MTDPARTS_DEFAULT="nmbm0:1024k(bl2),512k(u-boot-env),2048k(Factory),256k(bdinfo),2048k(fip),114688k(ubi)"
++CONFIG_MTDIDS_DEFAULT="spi-nand0=spi-nand0"
++CONFIG_MTDPARTS_DEFAULT="spi-nand0:1024k(bl2),512k(u-boot-env),2048k(Factory),256k(bdinfo),2048k(fip),125184k(ubi)"
+ CONFIG_CMD_UBI=y
+ CONFIG_CMD_GL_BTN=y
+ CONFIG_OF_EMBED=y
+ CONFIG_ENV_OVERWRITE=y
+-CONFIG_ENV_IS_IN_MTD=y
+-CONFIG_ENV_MTD_NAME="nmbm0"
+-CONFIG_ENV_SIZE_REDUND=0x80000
++CONFIG_ENV_IS_IN_UBI=y
++CONFIG_SYS_REDUNDAND_ENVIRONMENT=y
++CONFIG_ENV_UBI_PART="ubi"
++CONFIG_ENV_UBI_VOLUME="ubootenv"
++CONFIG_ENV_UBI_VOLUME_REDUND="ubootenv2"
+ CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG=y
+ CONFIG_NET_RANDOM_ETHADDR=y
++CONFIG_NET_FORCE_IPADDR=y
+ CONFIG_REGMAP=y
+ CONFIG_SYSCON=y
+ CONFIG_BUTTON=y
+diff --git a/uboot-mtk-20220606/configs/mt7981_h3c_magic-nx30-pro_defconfig b/uboot-mtk-20220606/configs/mt7981_h3c_magic-nx30-pro_defconfig
+index 190f355c6..90b2e2a08 100644
+--- a/uboot-mtk-20220606/configs/mt7981_h3c_magic-nx30-pro_defconfig
++++ b/uboot-mtk-20220606/configs/mt7981_h3c_magic-nx30-pro_defconfig
+@@ -4,11 +4,8 @@ CONFIG_ARCH_MEDIATEK=y
+ CONFIG_SYS_TEXT_BASE=0x41e00000
+ CONFIG_SYS_MALLOC_F_LEN=0x4000
+ CONFIG_NR_DRAM_BANKS=1
+-CONFIG_ENV_SIZE=0x20000
+-CONFIG_ENV_OFFSET=0x100000
+ CONFIG_DEFAULT_DEVICE_TREE="mt7981-h3c_magic-nx30-pro"
+ CONFIG_TARGET_MT7981=y
+-CONFIG_ENABLE_NAND_NMBM=y
+ CONFIG_MEDIATEK_BOOTMENU=y
+ CONFIG_MEDIATEK_BOOTMENU_DELAY=3
+ CONFIG_MEDIATEK_LOAD_FROM_RAM=y
+@@ -38,24 +35,26 @@ CONFIG_CMD_GPIO=y
+ CONFIG_CMD_GPIO_READ=y
+ CONFIG_CMD_MTD=y
+ # CONFIG_CMD_NAND_EXT is not set
+-CONFIG_CMD_NMBM=y
+ CONFIG_CMD_TFTPPUT=y
+ # CONFIG_CMD_NFS is not set
+ CONFIG_CMD_PING=y
+ CONFIG_CMD_LED_BLINK=y
+ CONFIG_CMD_SMC=y
+ CONFIG_CMD_MTDPARTS=y
+-CONFIG_MTDIDS_DEFAULT="nmbm0=nmbm0"
+-CONFIG_MTDPARTS_DEFAULT="nmbm0:1024k(bl2),512k(u-boot-env),2048k(Factory),2048k(fip),65536k(ubi),6144k(pdt_data),6144k(pdt_data_1),1024k(exp),38400k(plugin)"
++CONFIG_MTDIDS_DEFAULT="spi-nand0=spi-nand0"
++CONFIG_MTDPARTS_DEFAULT="spi-nand0:1024k(bl2),512k(u-boot-env),2048k(factory),2048k(fip),65536k(ubi),6144k(pdt_data),6144k(pdt_data_1),1024k(exp),38400k(plugin)"
+ CONFIG_CMD_UBI=y
+ CONFIG_CMD_GL_BTN=y
+ CONFIG_OF_EMBED=y
+ CONFIG_ENV_OVERWRITE=y
+-CONFIG_ENV_IS_IN_MTD=y
+-CONFIG_ENV_MTD_NAME="nmbm0"
+-CONFIG_ENV_SIZE_REDUND=0x80000
++CONFIG_ENV_IS_IN_UBI=y
++CONFIG_SYS_REDUNDAND_ENVIRONMENT=y
++CONFIG_ENV_UBI_PART="ubi"
++CONFIG_ENV_UBI_VOLUME="ubootenv"
++CONFIG_ENV_UBI_VOLUME_REDUND="ubootenv2"
+ CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG=y
+ CONFIG_NET_RANDOM_ETHADDR=y
++CONFIG_NET_FORCE_IPADDR=y
+ CONFIG_REGMAP=y
+ CONFIG_SYSCON=y
+ CONFIG_BUTTON=y
+diff --git a/uboot-mtk-20220606/configs/mt7981_imou_lc-hx3001_defconfig b/uboot-mtk-20220606/configs/mt7981_imou_lc-hx3001_defconfig
+index bce0ee4fc..80b4849da 100644
+--- a/uboot-mtk-20220606/configs/mt7981_imou_lc-hx3001_defconfig
++++ b/uboot-mtk-20220606/configs/mt7981_imou_lc-hx3001_defconfig
+@@ -4,11 +4,8 @@ CONFIG_ARCH_MEDIATEK=y
+ CONFIG_SYS_TEXT_BASE=0x41e00000
+ CONFIG_SYS_MALLOC_F_LEN=0x4000
+ CONFIG_NR_DRAM_BANKS=1
+-CONFIG_ENV_SIZE=0x80000
+-CONFIG_ENV_OFFSET=0x100000
+ CONFIG_DEFAULT_DEVICE_TREE="mt7981-imou_lc-hx3001"
+ CONFIG_TARGET_MT7981=y
+-CONFIG_ENABLE_NAND_NMBM=y
+ CONFIG_MEDIATEK_BOOTMENU=y
+ CONFIG_MEDIATEK_BOOTMENU_DELAY=3
+ CONFIG_MEDIATEK_LOAD_FROM_RAM=y
+@@ -17,6 +14,7 @@ CONFIG_DEBUG_UART_BASE=0x11002000
+ CONFIG_DEBUG_UART_CLOCK=40000000
+ CONFIG_SYS_LOAD_ADDR=0x46000000
+ CONFIG_DEBUG_UART=y
++CONFIG_ENV_VARS_UBOOT_CONFIG=y
+ CONFIG_BOOTDELAY=3
+ CONFIG_AUTOBOOT_MENU_SHOW=y
+ CONFIG_AUTOBOOT_MENU_MTK_SHOW=y
+@@ -38,23 +36,25 @@ CONFIG_CMD_GPIO=y
+ CONFIG_CMD_GPIO_READ=y
+ CONFIG_CMD_MTD=y
+ # CONFIG_CMD_NAND_EXT is not set
+-CONFIG_CMD_NMBM=y
+ CONFIG_CMD_TFTPPUT=y
+ # CONFIG_CMD_NFS is not set
+ CONFIG_CMD_PING=y
+ CONFIG_CMD_LED_BLINK=y
+ CONFIG_CMD_SMC=y
+ CONFIG_CMD_MTDPARTS=y
+-CONFIG_MTDIDS_DEFAULT="nmbm0=nmbm0"
+-CONFIG_MTDPARTS_DEFAULT="nmbm0:1024k(bl2),512k(u-boot-env),2048k(factory),2048k(fip),117248k(ubi)"
++CONFIG_MTDIDS_DEFAULT="spi-nand0=spi-nand0"
++CONFIG_MTDPARTS_DEFAULT="spi-nand0:1024k(bl2),512k(u-boot-env),2048k(factory),2048k(fip),125440k(ubi)"
+ CONFIG_CMD_UBI=y
+ CONFIG_CMD_GL_BTN=y
+ CONFIG_OF_EMBED=y
+ CONFIG_ENV_OVERWRITE=y
+-CONFIG_ENV_IS_IN_MTD=y
+-CONFIG_ENV_MTD_NAME="nmbm0"
+-CONFIG_ENV_SIZE_REDUND=0x80000
++CONFIG_ENV_IS_IN_UBI=y
++CONFIG_SYS_REDUNDAND_ENVIRONMENT=y
++CONFIG_ENV_UBI_PART="ubi"
++CONFIG_ENV_UBI_VOLUME="ubootenv"
++CONFIG_ENV_UBI_VOLUME_REDUND="ubootenv2"
+ CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG=y
++CONFIG_ENV_IMPORT_FDT=y
+ CONFIG_NET_RANDOM_ETHADDR=y
+ CONFIG_NET_FORCE_IPADDR=y
+ CONFIG_REGMAP=y
+diff --git a/uboot-mtk-20220606/configs/mt7981_jcg_q30_defconfig b/uboot-mtk-20220606/configs/mt7981_jcg_q30_defconfig
+index e4c2d4ca5..e8f2c8152 100644
+--- a/uboot-mtk-20220606/configs/mt7981_jcg_q30_defconfig
++++ b/uboot-mtk-20220606/configs/mt7981_jcg_q30_defconfig
+@@ -4,11 +4,8 @@ CONFIG_ARCH_MEDIATEK=y
+ CONFIG_SYS_TEXT_BASE=0x41e00000
+ CONFIG_SYS_MALLOC_F_LEN=0x4000
+ CONFIG_NR_DRAM_BANKS=1
+-CONFIG_ENV_SIZE=0x20000
+-CONFIG_ENV_OFFSET=0x100000
+ CONFIG_DEFAULT_DEVICE_TREE="mt7981-jcg_q30"
+ CONFIG_TARGET_MT7981=y
+-CONFIG_ENABLE_NAND_NMBM=y
+ CONFIG_MEDIATEK_BOOTMENU=y
+ CONFIG_MEDIATEK_BOOTMENU_DELAY=3
+ CONFIG_MEDIATEK_LOAD_FROM_RAM=y
+@@ -38,24 +35,26 @@ CONFIG_CMD_GPIO=y
+ CONFIG_CMD_GPIO_READ=y
+ CONFIG_CMD_MTD=y
+ # CONFIG_CMD_NAND_EXT is not set
+-CONFIG_CMD_NMBM=y
+ CONFIG_CMD_TFTPPUT=y
+ # CONFIG_CMD_NFS is not set
+ CONFIG_CMD_PING=y
+ CONFIG_CMD_LED_BLINK=y
+ CONFIG_CMD_SMC=y
+ CONFIG_CMD_MTDPARTS=y
+-CONFIG_MTDIDS_DEFAULT="nmbm0=nmbm0"
+-CONFIG_MTDPARTS_DEFAULT="nmbm0:1024k(bl2),512k(u-boot-env),2048k(Factory),2048k(fip),113152k(ubi)"
++CONFIG_MTDIDS_DEFAULT="spi-nand0=spi-nand0"
++CONFIG_MTDPARTS_DEFAULT="spi-nand0:1024k(bl2),512k(u-boot-env),2048k(factory),2048k(fip),114688k(ubi)"
+ CONFIG_CMD_UBI=y
+ CONFIG_CMD_GL_BTN=y
+ CONFIG_OF_EMBED=y
+ CONFIG_ENV_OVERWRITE=y
+-CONFIG_ENV_IS_IN_MTD=y
+-CONFIG_ENV_MTD_NAME="nmbm0"
+-CONFIG_ENV_SIZE_REDUND=0x80000
++CONFIG_ENV_IS_IN_UBI=y
++CONFIG_SYS_REDUNDAND_ENVIRONMENT=y
++CONFIG_ENV_UBI_PART="ubi"
++CONFIG_ENV_UBI_VOLUME="ubootenv"
++CONFIG_ENV_UBI_VOLUME_REDUND="ubootenv2"
+ CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG=y
+ CONFIG_NET_RANDOM_ETHADDR=y
++CONFIG_NET_FORCE_IPADDR=y
+ CONFIG_REGMAP=y
+ CONFIG_SYSCON=y
+ CONFIG_BUTTON=y
+diff --git a/uboot-mtk-20220606/configs/mt7981_konka_komi-a31_defconfig b/uboot-mtk-20220606/configs/mt7981_konka_komi-a31_defconfig
+index fff36dbdd..7a8f240d7 100644
+--- a/uboot-mtk-20220606/configs/mt7981_konka_komi-a31_defconfig
++++ b/uboot-mtk-20220606/configs/mt7981_konka_komi-a31_defconfig
+@@ -4,11 +4,8 @@ CONFIG_ARCH_MEDIATEK=y
+ CONFIG_SYS_TEXT_BASE=0x41e00000
+ CONFIG_SYS_MALLOC_F_LEN=0x4000
+ CONFIG_NR_DRAM_BANKS=1
+-CONFIG_ENV_SIZE=0x20000
+-CONFIG_ENV_OFFSET=0x100000
+ CONFIG_DEFAULT_DEVICE_TREE="mt7981-konka_komi-a31"
+ CONFIG_TARGET_MT7981=y
+-CONFIG_ENABLE_NAND_NMBM=y
+ CONFIG_MEDIATEK_BOOTMENU=y
+ CONFIG_MEDIATEK_BOOTMENU_DELAY=3
+ CONFIG_MEDIATEK_LOAD_FROM_RAM=y
+@@ -17,6 +14,7 @@ CONFIG_DEBUG_UART_BASE=0x11002000
+ CONFIG_DEBUG_UART_CLOCK=40000000
+ CONFIG_SYS_LOAD_ADDR=0x46000000
+ CONFIG_DEBUG_UART=y
++CONFIG_ENV_VARS_UBOOT_CONFIG=y
+ CONFIG_BOOTDELAY=3
+ CONFIG_AUTOBOOT_MENU_SHOW=y
+ CONFIG_AUTOBOOT_MENU_MTK_SHOW=y
+@@ -38,24 +36,27 @@ CONFIG_CMD_GPIO=y
+ CONFIG_CMD_GPIO_READ=y
+ CONFIG_CMD_MTD=y
+ # CONFIG_CMD_NAND_EXT is not set
+-CONFIG_CMD_NMBM=y
+ CONFIG_CMD_TFTPPUT=y
+ # CONFIG_CMD_NFS is not set
+ CONFIG_CMD_PING=y
+ CONFIG_CMD_LED_BLINK=y
+ CONFIG_CMD_SMC=y
+ CONFIG_CMD_MTDPARTS=y
+-CONFIG_MTDIDS_DEFAULT="nmbm0=nmbm0"
+-CONFIG_MTDPARTS_DEFAULT="nmbm0:1024k(bl2),512k(u-boot-env),2048k(factory),2048k(fip),114688k(ubi)"
++CONFIG_MTDIDS_DEFAULT="spi-nand0=spi-nand0"
++CONFIG_MTDPARTS_DEFAULT="spi-nand0:1024k(bl2),512k(u-boot-env),2048k(factory),2048k(fip),125440k(ubi)"
+ CONFIG_CMD_UBI=y
+ CONFIG_CMD_GL_BTN=y
+ CONFIG_OF_EMBED=y
+ CONFIG_ENV_OVERWRITE=y
+-CONFIG_ENV_IS_IN_MTD=y
+-CONFIG_ENV_MTD_NAME="nmbm0"
+-CONFIG_ENV_SIZE_REDUND=0x80000
++CONFIG_ENV_IS_IN_UBI=y
++CONFIG_SYS_REDUNDAND_ENVIRONMENT=y
++CONFIG_ENV_UBI_PART="ubi"
++CONFIG_ENV_UBI_VOLUME="ubootenv"
++CONFIG_ENV_UBI_VOLUME_REDUND="ubootenv2"
+ CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG=y
++CONFIG_ENV_IMPORT_FDT=y
+ CONFIG_NET_RANDOM_ETHADDR=y
++CONFIG_NET_FORCE_IPADDR=y
+ CONFIG_REGMAP=y
+ CONFIG_SYSCON=y
+ CONFIG_BUTTON=y
+diff --git a/uboot-mtk-20220606/configs/mt7981_livinet_zr-3020_defconfig b/uboot-mtk-20220606/configs/mt7981_livinet_zr-3020_defconfig
+index a7fc57965..a675da651 100644
+--- a/uboot-mtk-20220606/configs/mt7981_livinet_zr-3020_defconfig
++++ b/uboot-mtk-20220606/configs/mt7981_livinet_zr-3020_defconfig
+@@ -4,11 +4,8 @@ CONFIG_ARCH_MEDIATEK=y
+ CONFIG_SYS_TEXT_BASE=0x41e00000
+ CONFIG_SYS_MALLOC_F_LEN=0x4000
+ CONFIG_NR_DRAM_BANKS=1
+-CONFIG_ENV_SIZE=0x20000
+-CONFIG_ENV_OFFSET=0x100000
+ CONFIG_DEFAULT_DEVICE_TREE="mt7981-livinet_zr-3020"
+ CONFIG_TARGET_MT7981=y
+-CONFIG_ENABLE_NAND_NMBM=y
+ CONFIG_MEDIATEK_BOOTMENU=y
+ CONFIG_MEDIATEK_BOOTMENU_DELAY=3
+ CONFIG_MEDIATEK_LOAD_FROM_RAM=y
+@@ -17,6 +14,7 @@ CONFIG_DEBUG_UART_BASE=0x11002000
+ CONFIG_DEBUG_UART_CLOCK=40000000
+ CONFIG_SYS_LOAD_ADDR=0x46000000
+ CONFIG_DEBUG_UART=y
++CONFIG_ENV_VARS_UBOOT_CONFIG=y
+ CONFIG_BOOTDELAY=3
+ CONFIG_AUTOBOOT_MENU_SHOW=y
+ CONFIG_AUTOBOOT_MENU_MTK_SHOW=y
+@@ -38,24 +36,27 @@ CONFIG_CMD_GPIO=y
+ CONFIG_CMD_GPIO_READ=y
+ CONFIG_CMD_MTD=y
+ # CONFIG_CMD_NAND_EXT is not set
+-CONFIG_CMD_NMBM=y
+ CONFIG_CMD_TFTPPUT=y
+ # CONFIG_CMD_NFS is not set
+ CONFIG_CMD_PING=y
+ CONFIG_CMD_LED_BLINK=y
+ CONFIG_CMD_SMC=y
+ CONFIG_CMD_MTDPARTS=y
+-CONFIG_MTDIDS_DEFAULT="nmbm0=nmbm0"
+-CONFIG_MTDPARTS_DEFAULT="nmbm0:1024k(bl2),512k(u-boot-env),2048k(Factory),2048k(fip),65536k(ubi),32768k(firmware_backup),1024k(zrsave),1024k(config2)"
++CONFIG_MTDIDS_DEFAULT="spi-nand0=spi-nand0"
++CONFIG_MTDPARTS_DEFAULT="spi-nand0:1024k(bl2),512k(u-boot-env),2048k(Factory),2048k(fip),98304k(ubi),1024k(zrsave),1024k(config2)"
+ CONFIG_CMD_UBI=y
+ CONFIG_CMD_GL_BTN=y
+ CONFIG_OF_EMBED=y
+ CONFIG_ENV_OVERWRITE=y
+-CONFIG_ENV_IS_IN_MTD=y
+-CONFIG_ENV_MTD_NAME="nmbm0"
+-CONFIG_ENV_SIZE_REDUND=0x80000
++CONFIG_ENV_IS_IN_UBI=y
++CONFIG_SYS_REDUNDAND_ENVIRONMENT=y
++CONFIG_ENV_UBI_PART="ubi"
++CONFIG_ENV_UBI_VOLUME="ubootenv"
++CONFIG_ENV_UBI_VOLUME_REDUND="ubootenv2"
+ CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG=y
++CONFIG_ENV_IMPORT_FDT=y
+ CONFIG_NET_RANDOM_ETHADDR=y
++CONFIG_NET_FORCE_IPADDR=y
+ CONFIG_REGMAP=y
+ CONFIG_SYSCON=y
+ CONFIG_BUTTON=y
+diff --git a/uboot-mtk-20220606/configs/mt7981_nokia_ea0326gmp_defconfig b/uboot-mtk-20220606/configs/mt7981_nokia_ea0326gmp_defconfig
+index 25ca1d07f..8f9cc1761 100644
+--- a/uboot-mtk-20220606/configs/mt7981_nokia_ea0326gmp_defconfig
++++ b/uboot-mtk-20220606/configs/mt7981_nokia_ea0326gmp_defconfig
+@@ -4,11 +4,8 @@ CONFIG_ARCH_MEDIATEK=y
+ CONFIG_SYS_TEXT_BASE=0x41e00000
+ CONFIG_SYS_MALLOC_F_LEN=0x4000
+ CONFIG_NR_DRAM_BANKS=1
+-CONFIG_ENV_SIZE=0x20000
+-CONFIG_ENV_OFFSET=0x100000
+ CONFIG_DEFAULT_DEVICE_TREE="mt7981-nokia-ea0326gmp"
+ CONFIG_TARGET_MT7981=y
+-CONFIG_ENABLE_NAND_NMBM=y
+ CONFIG_MEDIATEK_BOOTMENU=y
+ CONFIG_MEDIATEK_BOOTMENU_DELAY=3
+ CONFIG_MEDIATEK_LOAD_FROM_RAM=y
+@@ -17,6 +14,7 @@ CONFIG_DEBUG_UART_BASE=0x11002000
+ CONFIG_DEBUG_UART_CLOCK=40000000
+ CONFIG_SYS_LOAD_ADDR=0x46000000
+ CONFIG_DEBUG_UART=y
++CONFIG_ENV_VARS_UBOOT_CONFIG=y
+ CONFIG_BOOTDELAY=3
+ CONFIG_AUTOBOOT_MENU_SHOW=y
+ CONFIG_AUTOBOOT_MENU_MTK_SHOW=y
+@@ -38,24 +36,27 @@ CONFIG_CMD_GPIO=y
+ CONFIG_CMD_GPIO_READ=y
+ CONFIG_CMD_MTD=y
+ # CONFIG_CMD_NAND_EXT is not set
+-CONFIG_CMD_NMBM=y
+ CONFIG_CMD_TFTPPUT=y
+ # CONFIG_CMD_NFS is not set
+ CONFIG_CMD_PING=y
+ CONFIG_CMD_LED_BLINK=y
+ CONFIG_CMD_SMC=y
+ CONFIG_CMD_MTDPARTS=y
+-CONFIG_MTDIDS_DEFAULT="nmbm0=nmbm0"
+-CONFIG_MTDPARTS_DEFAULT="nmbm0:1024k(bl2),512k(u-boot-env),2048k(Factory),2048k(fip),2048k(Config),2048k(Config2),112640k(ubi)"
++CONFIG_MTDIDS_DEFAULT="spi-nand0=spi-nand0"
++CONFIG_MTDPARTS_DEFAULT="spi-nand0:1024k(bl2),512k(u-boot-env),2048k(factory),2048k(fip),2048k(Config),2048k(Config2),121344k(ubi)"
+ CONFIG_CMD_UBI=y
+ CONFIG_CMD_GL_BTN=y
+ CONFIG_OF_EMBED=y
+ CONFIG_ENV_OVERWRITE=y
+-CONFIG_ENV_IS_IN_MTD=y
+-CONFIG_ENV_MTD_NAME="nmbm0"
+-CONFIG_ENV_SIZE_REDUND=0x80000
++CONFIG_ENV_IS_IN_UBI=y
++CONFIG_SYS_REDUNDAND_ENVIRONMENT=y
++CONFIG_ENV_UBI_PART="ubi"
++CONFIG_ENV_UBI_VOLUME="ubootenv"
++CONFIG_ENV_UBI_VOLUME_REDUND="ubootenv2"
+ CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG=y
++CONFIG_ENV_IMPORT_FDT=y
+ CONFIG_NET_RANDOM_ETHADDR=y
++CONFIG_NET_FORCE_IPADDR=y
+ CONFIG_REGMAP=y
+ CONFIG_SYSCON=y
+ CONFIG_BUTTON=y
+diff --git a/uboot-mtk-20220606/configs/mt7981_wr30u_defconfig b/uboot-mtk-20220606/configs/mt7981_wr30u_defconfig
+index f4417e7d2..0dfd12183 100644
+--- a/uboot-mtk-20220606/configs/mt7981_wr30u_defconfig
++++ b/uboot-mtk-20220606/configs/mt7981_wr30u_defconfig
+@@ -4,11 +4,8 @@ CONFIG_ARCH_MEDIATEK=y
+ CONFIG_SYS_TEXT_BASE=0x41e00000
+ CONFIG_SYS_MALLOC_F_LEN=0x4000
+ CONFIG_NR_DRAM_BANKS=1
+-CONFIG_ENV_SIZE=0x10000
+-CONFIG_ENV_OFFSET=0x100000
+ CONFIG_DEFAULT_DEVICE_TREE="mt7981-wr30u"
+ CONFIG_TARGET_MT7981=y
+-CONFIG_ENABLE_NAND_NMBM=y
+ CONFIG_MEDIATEK_BOOTMENU=y
+ CONFIG_MEDIATEK_BOOTMENU_DELAY=3
+ CONFIG_MEDIATEK_LOAD_FROM_RAM=y
+@@ -38,25 +35,26 @@ CONFIG_CMD_GPIO=y
+ CONFIG_CMD_GPIO_READ=y
+ CONFIG_CMD_MTD=y
+ # CONFIG_CMD_NAND_EXT is not set
+-CONFIG_CMD_NMBM=y
+ CONFIG_CMD_TFTPPUT=y
+ # CONFIG_CMD_NFS is not set
+ CONFIG_CMD_PING=y
+ CONFIG_CMD_LED_BLINK=y
+ CONFIG_CMD_SMC=y
+ CONFIG_CMD_MTDPARTS=y
+-CONFIG_MTDIDS_DEFAULT="nmbm0=nmbm0"
+-CONFIG_MTDPARTS_DEFAULT="nmbm0:1024k(bl2),256k(Nvram),256k(Bdata),2048k(factory),2048k(fip),256k(crash),256k(crash_log),112m(ubi),256k(KF)"
++CONFIG_MTDIDS_DEFAULT="spi-nand0=spi-nand0"
++CONFIG_MTDPARTS_DEFAULT="spi-nand0:1024k(bl2),256k(Nvram),256k(Bdata),2048k(factory),2048k(fip),256k(crash),256k(crash_log),114688k(ubi),256k(KF)"
+ CONFIG_CMD_UBI=y
+ CONFIG_CMD_GL_BTN=y
+-CONFIG_CMD_SHOW_MTD_LAYOUT=y
+ CONFIG_OF_EMBED=y
+ CONFIG_ENV_OVERWRITE=y
+-CONFIG_ENV_IS_IN_MTD=y
+-CONFIG_ENV_MTD_NAME="nmbm0"
+-CONFIG_ENV_SIZE_REDUND=0x80000
++CONFIG_ENV_IS_IN_UBI=y
++CONFIG_SYS_REDUNDAND_ENVIRONMENT=y
++CONFIG_ENV_UBI_PART="ubi"
++CONFIG_ENV_UBI_VOLUME="ubootenv"
++CONFIG_ENV_UBI_VOLUME_REDUND="ubootenv2"
+ CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG=y
+ CONFIG_NET_RANDOM_ETHADDR=y
++CONFIG_NET_FORCE_IPADDR=y
+ CONFIG_REGMAP=y
+ CONFIG_SYSCON=y
+ CONFIG_BUTTON=y
+diff --git a/uboot-mtk-20220606/configs/mt7986_jdcloud_re-cp-03_defconfig b/uboot-mtk-20220606/configs/mt7986_jdcloud_re-cp-03_defconfig
+index 26ff77a7a..82ad118e4 100644
+--- a/uboot-mtk-20220606/configs/mt7986_jdcloud_re-cp-03_defconfig
++++ b/uboot-mtk-20220606/configs/mt7986_jdcloud_re-cp-03_defconfig
+@@ -4,7 +4,7 @@ CONFIG_ARCH_MEDIATEK=y
+ CONFIG_SYS_TEXT_BASE=0x41e00000
+ CONFIG_SYS_MALLOC_F_LEN=0x4000
+ CONFIG_NR_DRAM_BANKS=1
+-CONFIG_ENV_SIZE=0x80000
++CONFIG_ENV_SIZE=0x40000
+ CONFIG_ENV_OFFSET=0x400000
+ CONFIG_DEFAULT_DEVICE_TREE="mt7986a-jdcloud_re-cp-03"
+ CONFIG_TARGET_MT7986=y
+@@ -13,6 +13,7 @@ CONFIG_MEDIATEK_BOOTMENU_DELAY=3
+ CONFIG_MT7986_BOOTMENU_EMMC=y
+ CONFIG_DEBUG_UART_BASE=0x11002000
+ CONFIG_DEBUG_UART_CLOCK=40000000
++CONFIG_ENV_OFFSET_REDUND=0x440000
+ CONFIG_SYS_LOAD_ADDR=0x46000000
+ CONFIG_DEBUG_UART=y
+ CONFIG_ENV_VARS_UBOOT_CONFIG=y
+@@ -49,11 +50,13 @@ CONFIG_CMD_GL_BTN=y
+ CONFIG_PARTITION_TYPE_GUID=y
+ CONFIG_ENV_OVERWRITE=y
+ CONFIG_ENV_IS_IN_MMC=y
++CONFIG_SYS_REDUNDAND_ENVIRONMENT=y
+ CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG=y
+ CONFIG_ENV_IMPORT_FDT=y
+ CONFIG_ARP_TIMEOUT=1000
+ CONFIG_NET_RETRY_COUNT=3
+ CONFIG_NET_RANDOM_ETHADDR=y
++CONFIG_NET_FORCE_IPADDR=y
+ CONFIG_REGMAP=y
+ CONFIG_SYSCON=y
+ CONFIG_BUTTON=y
+diff --git a/uboot-mtk-20220606/configs/mt7986_netcore_n60-pro_defconfig b/uboot-mtk-20220606/configs/mt7986_netcore_n60-pro_defconfig
+index 00bd40258..74883e9fd 100644
+--- a/uboot-mtk-20220606/configs/mt7986_netcore_n60-pro_defconfig
++++ b/uboot-mtk-20220606/configs/mt7986_netcore_n60-pro_defconfig
+@@ -4,11 +4,8 @@ CONFIG_ARCH_MEDIATEK=y
+ CONFIG_SYS_TEXT_BASE=0x41e00000
+ CONFIG_SYS_MALLOC_F_LEN=0x4000
+ CONFIG_NR_DRAM_BANKS=1
+-CONFIG_ENV_SIZE=0x80000
+-CONFIG_ENV_OFFSET=0x100000
+ CONFIG_DEFAULT_DEVICE_TREE="mt7986a-netcore-n60-pro"
+ CONFIG_TARGET_MT7986=y
+-CONFIG_ENABLE_NAND_NMBM=y
+ CONFIG_MEDIATEK_BOOTMENU=y
+ CONFIG_MEDIATEK_BOOTMENU_DELAY=3
+ CONFIG_MT7986_BOOTMENU_UBI=y
+@@ -39,7 +36,6 @@ CONFIG_CMD_GPIO=y
+ CONFIG_CMD_GPIO_READ=y
+ CONFIG_CMD_MMC=y
+ CONFIG_CMD_MTD=y
+-CONFIG_CMD_NMBM=y
+ CONFIG_CMD_PCI=y
+ CONFIG_CMD_TFTPPUT=y
+ # CONFIG_CMD_NFS is not set
+@@ -47,8 +43,8 @@ CONFIG_CMD_PING=y
+ CONFIG_CMD_LED_BLINK=y
+ CONFIG_CMD_SMC=y
+ CONFIG_CMD_MTDPARTS=y
+-CONFIG_MTDIDS_DEFAULT="nmbm0=nmbm0"
+-CONFIG_MTDPARTS_DEFAULT="nmbm0:1024k(bl2),512k(u-boot-env),2048k(factory),2048k(fip),117248k(ubi)"
++CONFIG_MTDIDS_DEFAULT="spi-nand0=spi-nand0"
++CONFIG_MTDPARTS_DEFAULT="spi-nand0:1024k(bl2),512k(u-boot-env),2048k(factory),2048k(fip),125440k(ubi)"
+ CONFIG_CMD_UBI=y
+ CONFIG_CMD_GL_BTN=y
+ CONFIG_DOS_PARTITION=y
+@@ -56,11 +52,14 @@ CONFIG_EFI_PARTITION=y
+ CONFIG_PARTITION_TYPE_GUID=y
+ CONFIG_OF_EMBED=y
+ CONFIG_ENV_OVERWRITE=y
+-CONFIG_ENV_IS_IN_MTD=y
+-CONFIG_ENV_MTD_NAME="nmbm0"
+-CONFIG_ENV_SIZE_REDUND=0x80000
++CONFIG_ENV_IS_IN_UBI=y
++CONFIG_SYS_REDUNDAND_ENVIRONMENT=y
++CONFIG_ENV_UBI_PART="ubi"
++CONFIG_ENV_UBI_VOLUME="ubootenv"
++CONFIG_ENV_UBI_VOLUME_REDUND="ubootenv2"
+ CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG=y
+ CONFIG_NET_RANDOM_ETHADDR=y
++CONFIG_NET_FORCE_IPADDR=y
+ CONFIG_REGMAP=y
+ CONFIG_SYSCON=y
+ CONFIG_BUTTON=y
+diff --git a/uboot-mtk-20220606/configs/mt7986_netcore_n60_defconfig b/uboot-mtk-20220606/configs/mt7986_netcore_n60_defconfig
+index 60405ddf0..c4ccb6d52 100644
+--- a/uboot-mtk-20220606/configs/mt7986_netcore_n60_defconfig
++++ b/uboot-mtk-20220606/configs/mt7986_netcore_n60_defconfig
+@@ -4,11 +4,8 @@ CONFIG_ARCH_MEDIATEK=y
+ CONFIG_SYS_TEXT_BASE=0x41e00000
+ CONFIG_SYS_MALLOC_F_LEN=0x4000
+ CONFIG_NR_DRAM_BANKS=1
+-CONFIG_ENV_SIZE=0x80000
+-CONFIG_ENV_OFFSET=0x100000
+ CONFIG_DEFAULT_DEVICE_TREE="mt7986a-netcore-n60"
+ CONFIG_TARGET_MT7986=y
+-CONFIG_ENABLE_NAND_NMBM=y
+ CONFIG_MEDIATEK_BOOTMENU=y
+ CONFIG_MEDIATEK_BOOTMENU_DELAY=3
+ CONFIG_MT7986_BOOTMENU_UBI=y
+@@ -39,7 +36,6 @@ CONFIG_CMD_GPIO=y
+ CONFIG_CMD_GPIO_READ=y
+ CONFIG_CMD_MMC=y
+ CONFIG_CMD_MTD=y
+-CONFIG_CMD_NMBM=y
+ CONFIG_CMD_PCI=y
+ CONFIG_CMD_TFTPPUT=y
+ # CONFIG_CMD_NFS is not set
+@@ -47,8 +43,8 @@ CONFIG_CMD_PING=y
+ CONFIG_CMD_LED_BLINK=y
+ CONFIG_CMD_SMC=y
+ CONFIG_CMD_MTDPARTS=y
+-CONFIG_MTDIDS_DEFAULT="nmbm0=nmbm0"
+-CONFIG_MTDPARTS_DEFAULT="nmbm0:1024k(bl2),512k(u-boot-env),2048k(factory),2048k(fip),117248k(ubi)"
++CONFIG_MTDIDS_DEFAULT="spi-nand0=spi-nand0"
++CONFIG_MTDPARTS_DEFAULT="spi-nand0:1024k(bl2),512k(u-boot-env),2048k(factory),2048k(fip),117248k(ubi)"
+ CONFIG_CMD_UBI=y
+ CONFIG_CMD_GL_BTN=y
+ CONFIG_DOS_PARTITION=y
+@@ -56,11 +52,14 @@ CONFIG_EFI_PARTITION=y
+ CONFIG_PARTITION_TYPE_GUID=y
+ CONFIG_OF_EMBED=y
+ CONFIG_ENV_OVERWRITE=y
+-CONFIG_ENV_IS_IN_MTD=y
+-CONFIG_ENV_MTD_NAME="nmbm0"
+-CONFIG_ENV_SIZE_REDUND=0x80000
++CONFIG_ENV_IS_IN_UBI=y
++CONFIG_SYS_REDUNDAND_ENVIRONMENT=y
++CONFIG_ENV_UBI_PART="ubi"
++CONFIG_ENV_UBI_VOLUME="ubootenv"
++CONFIG_ENV_UBI_VOLUME_REDUND="ubootenv2"
+ CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG=y
+ CONFIG_NET_RANDOM_ETHADDR=y
++CONFIG_NET_FORCE_IPADDR=y
+ CONFIG_REGMAP=y
+ CONFIG_SYSCON=y
+ CONFIG_BUTTON=y
+diff --git a/uboot-mtk-20220606/configs/mt7986_redmi_ax6000_defconfig b/uboot-mtk-20220606/configs/mt7986_redmi_ax6000_defconfig
+index cd0c7fbc3..488a5b859 100644
+--- a/uboot-mtk-20220606/configs/mt7986_redmi_ax6000_defconfig
++++ b/uboot-mtk-20220606/configs/mt7986_redmi_ax6000_defconfig
+@@ -4,11 +4,8 @@ CONFIG_ARCH_MEDIATEK=y
+ CONFIG_SYS_TEXT_BASE=0x41e00000
+ CONFIG_SYS_MALLOC_F_LEN=0x4000
+ CONFIG_NR_DRAM_BANKS=1
+-CONFIG_ENV_SIZE=0x10000
+-CONFIG_ENV_OFFSET=0x100000
+ CONFIG_DEFAULT_DEVICE_TREE="mt7986a-redmi-ax6000"
+ CONFIG_TARGET_MT7986=y
+-CONFIG_ENABLE_NAND_NMBM=y
+ CONFIG_MEDIATEK_BOOTMENU=y
+ CONFIG_MEDIATEK_BOOTMENU_DELAY=3
+ CONFIG_MT7986_BOOTMENU_UBI=y
+@@ -39,7 +36,6 @@ CONFIG_CMD_GPIO=y
+ CONFIG_CMD_GPIO_READ=y
+ CONFIG_CMD_MMC=y
+ CONFIG_CMD_MTD=y
+-CONFIG_CMD_NMBM=y
+ CONFIG_CMD_PCI=y
+ CONFIG_CMD_TFTPPUT=y
+ # CONFIG_CMD_NFS is not set
+@@ -47,8 +43,8 @@ CONFIG_CMD_PING=y
+ CONFIG_CMD_LED_BLINK=y
+ CONFIG_CMD_SMC=y
+ CONFIG_CMD_MTDPARTS=y
+-CONFIG_MTDIDS_DEFAULT="nmbm0=nmbm0"
+-CONFIG_MTDPARTS_DEFAULT="nmbm0:1024k(bl2),256k(Nvram),256k(Bdata),2048k(factory),2048k(fip),256k(crash),256k(crash_log),112640k(ubi)"
++CONFIG_MTDIDS_DEFAULT="spi-nand0=spi-nand0"
++CONFIG_MTDPARTS_DEFAULT="spi-nand0:1024k(bl2),256k(Nvram),256k(Bdata),2048k(factory),2048k(fip),125440k(ubi)"
+ CONFIG_CMD_UBI=y
+ CONFIG_CMD_GL_BTN=y
+ CONFIG_DOS_PARTITION=y
+@@ -56,11 +52,14 @@ CONFIG_EFI_PARTITION=y
+ CONFIG_PARTITION_TYPE_GUID=y
+ CONFIG_OF_EMBED=y
+ CONFIG_ENV_OVERWRITE=y
+-CONFIG_ENV_IS_IN_MTD=y
+-CONFIG_ENV_MTD_NAME="nmbm0"
+-CONFIG_ENV_SIZE_REDUND=0x80000
++CONFIG_ENV_IS_IN_UBI=y
++CONFIG_SYS_REDUNDAND_ENVIRONMENT=y
++CONFIG_ENV_UBI_PART="ubi"
++CONFIG_ENV_UBI_VOLUME="ubootenv"
++CONFIG_ENV_UBI_VOLUME_REDUND="ubootenv2"
+ CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG=y
+ CONFIG_NET_RANDOM_ETHADDR=y
++CONFIG_NET_FORCE_IPADDR=y
+ CONFIG_REGMAP=y
+ CONFIG_SYSCON=y
+ CONFIG_BUTTON=y
+diff --git a/uboot-mtk-20220606/configs/mt7986_tplink_tl-xdr608x_defconfig b/uboot-mtk-20220606/configs/mt7986_tplink_tl-xdr608x_defconfig
+index a98795e3f..2352475a3 100644
+--- a/uboot-mtk-20220606/configs/mt7986_tplink_tl-xdr608x_defconfig
++++ b/uboot-mtk-20220606/configs/mt7986_tplink_tl-xdr608x_defconfig
+@@ -4,8 +4,6 @@ CONFIG_ARCH_MEDIATEK=y
+ CONFIG_SYS_TEXT_BASE=0x41e00000
+ CONFIG_SYS_MALLOC_F_LEN=0x4000
+ CONFIG_NR_DRAM_BANKS=1
+-CONFIG_ENV_SIZE=0x80000
+-CONFIG_ENV_OFFSET=0x300000
+ CONFIG_DEFAULT_DEVICE_TREE="mt7986a-tplink-tl-xdr608x"
+ CONFIG_TARGET_MT7986=y
+ CONFIG_MEDIATEK_BOOTMENU=y
+@@ -46,7 +44,7 @@ CONFIG_CMD_LED_BLINK=y
+ CONFIG_CMD_SMC=y
+ CONFIG_CMD_MTDPARTS=y
+ CONFIG_MTDIDS_DEFAULT="spi-nand0=spi-nand0"
+-CONFIG_MTDPARTS_DEFAULT="spi-nand0:1024k(bl2),384k(config),640k(factory),1024k(reserved),512k(u-boot-env),1536k(fip),117760k(ubi)"
++CONFIG_MTDPARTS_DEFAULT="spi-nand0:1024k(bl2),384k(config),384k(factory),1792k(reserved),2048k(fip),122880k(ubi)"
+ CONFIG_CMD_UBI=y
+ CONFIG_CMD_GL_BTN=y
+ CONFIG_DOS_PARTITION=y
+@@ -54,11 +52,14 @@ CONFIG_EFI_PARTITION=y
+ CONFIG_PARTITION_TYPE_GUID=y
+ CONFIG_OF_EMBED=y
+ CONFIG_ENV_OVERWRITE=y
+-CONFIG_ENV_IS_IN_MTD=y
+-CONFIG_ENV_MTD_NAME="spi-nand0"
+-CONFIG_ENV_SIZE_REDUND=0x80000
++CONFIG_ENV_IS_IN_UBI=y
++CONFIG_SYS_REDUNDAND_ENVIRONMENT=y
++CONFIG_ENV_UBI_PART="ubi"
++CONFIG_ENV_UBI_VOLUME="ubootenv"
++CONFIG_ENV_UBI_VOLUME_REDUND="ubootenv2"
+ CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG=y
+ CONFIG_NET_RANDOM_ETHADDR=y
++CONFIG_NET_FORCE_IPADDR=y
+ CONFIG_REGMAP=y
+ CONFIG_SYSCON=y
+ CONFIG_BUTTON=y
+diff --git a/uboot-mtk-20220606/configs/mt7986_tplink_tl-xtr8488_defconfig b/uboot-mtk-20220606/configs/mt7986_tplink_tl-xtr8488_defconfig
+index 71996bf43..2f9dd070e 100644
+--- a/uboot-mtk-20220606/configs/mt7986_tplink_tl-xtr8488_defconfig
++++ b/uboot-mtk-20220606/configs/mt7986_tplink_tl-xtr8488_defconfig
+@@ -51,7 +51,15 @@ CONFIG_DOS_PARTITION=y
+ CONFIG_EFI_PARTITION=y
+ CONFIG_PARTITION_TYPE_GUID=y
+ CONFIG_OF_EMBED=y
++CONFIG_ENV_OVERWRITE=y
++CONFIG_ENV_IS_IN_UBI=y
++CONFIG_SYS_REDUNDAND_ENVIRONMENT=y
++CONFIG_ENV_UBI_PART="ubi"
++CONFIG_ENV_UBI_VOLUME="ubootenv"
++CONFIG_ENV_UBI_VOLUME_REDUND="ubootenv2"
++CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG=y
+ CONFIG_NET_RANDOM_ETHADDR=y
++CONFIG_NET_FORCE_IPADDR=y
+ CONFIG_REGMAP=y
+ CONFIG_SYSCON=y
+ CONFIG_BUTTON=y
+-- 
+2.34.1
+

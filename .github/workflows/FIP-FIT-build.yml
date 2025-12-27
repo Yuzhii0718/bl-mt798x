@@ -1,7 +1,19 @@
 name: Build FIT BL2 and FIP
 
 on:
-  push:
+  workflow_dispatch:
+    inputs:
+      OC_BL2:
+        description: 'Build 1.6GHz BL2 by patch'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  TZ: Asia/Shanghai
+
+permissions:
+  contents: write
 
 jobs:
   generate_list:
@@ -9,6 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       list: ${{ steps.list.outputs.list }}
+      timestamp: ${{ steps.ts.outputs.timestamp }}
 
     steps:
       - name: Checkout source tree
@@ -16,11 +29,33 @@ jobs:
         with:
           fetch-depth: '0'
 
+      - name: Generate timestamp
+        id: ts
+        run: |
+          echo "timestamp=$(date -u +%Y%m%d%H%M%S)" >> "$GITHUB_OUTPUT"
+
       - name: Generate build list
         id: list
         run: |
-          COMMIT="$(git log --pretty=format:"%H" -1 uboot-mtk-*/configs)"
-          CONFIGS="$(git show --name-only "$COMMIT" | awk -F '/' '/^uboot.*defconfig$/ {printf "\"%s\",", $NF}' | sed 's/,$//')"
+          PATCH_FILE="modify-patch/0002-uboot-2022-fit-merge-code-from-1715173329-to-support.patch"
+          test -f "$PATCH_FILE"
+
+          # Extract defconfig filenames touched by the patch (unique, basename only).
+          # Expected diff line format: diff --git a/<path> b/<path>
+          CONFIGS="$(
+            awk '/^diff --git a\// {print $4}' "$PATCH_FILE" \
+              | sed 's/^b\///' \
+              | awk -F '/' '/defconfig$/ {print $NF}' \
+              | sort -u \
+              | awk '{printf "\"%s\",", $0}' \
+              | sed 's/,$//'
+          )"
+
+          if [ -z "$CONFIGS" ]; then
+            echo "No *defconfig entries found in patch: $PATCH_FILE" >&2
+            exit 1
+          fi
+
           JSON_LIST="{\"runner\": [\"ubuntu-latest\"],\"list\": [$CONFIGS]}"
           echo "$JSON_LIST" | jq .
           echo "list=$JSON_LIST" >> "$GITHUB_OUTPUT"
@@ -29,6 +64,8 @@ jobs:
     name: Build ${{ matrix.list }}
     needs: generate_list
     runs-on: ${{ matrix.runner }}
+    env:
+      TIMESTAMP: ${{ needs.generate_list.outputs.timestamp }}
     strategy:
       matrix: ${{ fromJson(needs.generate_list.outputs.list) }}
       fail-fast: false
@@ -39,10 +76,21 @@ jobs:
         env:
           DEBIAN_FRONTEND: noninteractive
         run: |
+          sudo -E apt-get update
           sudo -E apt-get install gcc-aarch64-linux-gnu build-essential flex bison libssl-dev device-tree-compiler
+          sudo timedatectl set-timezone "$TZ"
 
       - name: Checkout source tree
         uses: actions/checkout@v4
+
+      - name: Apply required patches
+        run: |
+          git apply --verbose "modify-patch/0002-uboot-2022-fit-merge-code-from-1715173329-to-support.patch"
+
+      - name: Apply overclocking BL2 patch (1.6GHz)
+        if: ${{ inputs.OC_BL2 }}
+        run: |
+          git apply --verbose "modify-patch/0001-overclocking-mt7981-to-1.6GHz-by-modify-atf.patch"
 
       - name: Build BL2 and FIP
         env:
@@ -51,13 +99,69 @@ jobs:
           export SOC="${CONFIG%%_*}"
           BOARD="${CONFIG#*_}"
           export BOARD="${BOARD%_*}"
+          export VERSION="2022"
           mkdir -p "output"
-          ./build.sh 2>&1 | tee "output/build.log"
-          sha256sum "output"/* | sed "s|output/||" > "output/sha256sums"
+          SOC="$SOC" BOARD="$BOARD" VERSION="$VERSION" ./build.sh 2>&1 | tee "output/build.log"
           echo "ARTIFACT_NAME=$SOC-$BOARD" >> "$GITHUB_ENV"
+
+      - name: Organize and rename outputs
+        run: |
+          set -euo pipefail
+          SUFFIX="-FIT-${TIMESTAMP}"
+
+          shopt -s nullglob
+          for f in output/*; do
+            [ -f "$f" ] || continue
+            base="$(basename "$f")"
+
+            if [[ "$base" == *.* ]]; then
+              ext=".${base##*.}"
+              name="${base%.*}"
+              mv -f "$f" "output/${name}${SUFFIX}${ext}"
+            else
+              mv -f "$f" "output/${base}${SUFFIX}"
+            fi
+          done
+
+          # Re-generate sha256sums AFTER renaming; exclude sha256sums itself.
+          (
+            cd output
+            find . -maxdepth 1 -type f ! -name 'sha256sums*' -print0 \
+              | sort -z \
+              | xargs -0 sha256sum \
+              > "sha256sums${SUFFIX}.txt"
+          )
 
       - name: Upload build outputs
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.ARTIFACT_NAME }}
           path: output/*
+
+  release:
+    name: Release firmware
+    needs: [generate_list, build]
+    runs-on: ubuntu-latest
+    if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+
+    steps:
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Generate release tag
+        run: |
+          echo "TIMESTAMP=${{ needs.generate_list.outputs.timestamp }}" >> "$GITHUB_ENV"
+          echo "RELEASE_TAG=dhcp-Yuzhii-FIT-${{ needs.generate_list.outputs.timestamp }}" >> "$GITHUB_ENV"
+          echo "RELEASE_NAME=dhcp-Yuzhii-FIT-${{ needs.generate_list.outputs.timestamp }}" >> "$GITHUB_ENV"
+
+      - name: Publish firmware to Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.RELEASE_TAG }}
+          name: ${{ env.RELEASE_NAME }}
+          generate_release_notes: true
+          files: |
+            dist/**
