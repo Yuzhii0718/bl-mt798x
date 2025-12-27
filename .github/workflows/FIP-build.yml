@@ -194,7 +194,7 @@ jobs:
       if: github.event.inputs.OC_BL2 == 'true' && !cancelled()
       run: |
         cd bl-mt798x
-        git apply overclocking-patch/0001-overclocking-mt7981-to-1.6GHz-by-modify-atf.patch
+        git apply modify-patch/0001-overclocking-mt7981-to-1.6GHz-by-modify-atf.patch
         echo "status=success" >> $GITHUB_OUTPUT
         echo "OC_BL2=1" >> $GITHUB_ENV
 
