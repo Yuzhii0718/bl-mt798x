@@ -43,6 +43,11 @@ on:
         required: false
         default: false
         type: boolean
+      MULTI_LAYOUT:
+        description: 'Enable MULTI_LAYOUT(Only supported devices)'
+        required: false
+        default: false
+        type: boolean
       ssh:
         description: 'SSH connection to Actions'
         required: false
@@ -198,6 +203,13 @@ jobs:
       run: |
         cd bl-mt798x
         chmod +x ./build.sh
+
+        # MULTI_LAYOUT 开关
+        if [ "${{ github.event.inputs.MULTI_LAYOUT }}" = "true" ]; then
+          echo "已启用 MULTI_LAYOUT=1"
+        else
+          echo "未启用 MULTI_LAYOUT"
+        fi
         
         # 解析需要编译的版本列表
         if [ "${{ github.event.inputs.FIP_VERSION }}" = "all" ]; then
@@ -211,7 +223,11 @@ jobs:
         # 逐版本编译并缓存到各自临时目录
         for version in "${SUPPORTED_VERSIONS[@]}"; do
           echo "正在编译${version}版本FIP..."
-          SOC=mt7981 BOARD=${{ github.event.inputs.MODEL }} VERSION=${version} ./build.sh
+          if [ "${{ github.event.inputs.MULTI_LAYOUT }}" = "true" ]; then
+            SOC=mt7981 BOARD=${{ github.event.inputs.MODEL }} VERSION=${version} MULTI_LAYOUT=1 ./build.sh
+          else
+            SOC=mt7981 BOARD=${{ github.event.inputs.MODEL }} VERSION=${version} ./build.sh
+          fi
           mkdir -p "temp_output_${version}"
           if [ -d "output" ]; then
             cp -r output/* "temp_output_${version}/" || true
@@ -297,6 +313,11 @@ jobs:
         echo "- 使用源码：${{ env.REPO_URL }}" >> release.txt
         echo "- 使用分支：${{ env.REPO_BRANCH }}" >> release.txt
         echo "- 使用版本：${{ github.event.inputs.FIP_VERSION }}" >> release.txt
+        if [ "${{ github.event.inputs.MULTI_LAYOUT }}" = "true" ]; then
+          echo "- 已启用 MULTI_LAYOUT=1" >> release.txt
+        else
+          echo "- 未启用 MULTI_LAYOUT" >> release.txt
+        fi
         if [ "${{ github.event.inputs.GEN_BL2 }}" = "true" ]; then
           echo "- 已开启 ATF22/23 BL2 生成" >> release.txt
         else
