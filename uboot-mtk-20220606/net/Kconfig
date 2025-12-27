@@ -34,6 +34,14 @@ config HTTPD
 	default n
 	depends on TCP
 
+config MTK_DHCPD
+	bool "Minimal DHCP server for MediaTek web failsafe"
+	default y
+	depends on HTTPD
+	help
+	  Enable a minimal DHCPv4 server that answers DHCPDISCOVER/DHCPREQUEST
+	  while the MediaTek web failsafe UI (httpd) is running.
+
 config BOOTDEV_ETH
 	bool "Enable bootdev for ethernet"
 	depends on BOOTSTD

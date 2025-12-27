@@ -33,6 +33,7 @@ obj-$(CONFIG_PROT_UDP) += udp.o
 
 obj-$(CONFIG_TCP)  += tcp.o
 obj-$(CONFIG_HTTPD)  += httpd.o
+obj-$(CONFIG_MTK_DHCPD)  += mtk_dhcpd.o
 
 # Disable this warning as it is triggered by:
 # sprintf(buf, index ? "foo%d" : "foo", index)

@@ -118,6 +118,9 @@
 #include "wol.h"
 #endif
 #include "tcp.h"
+#if defined(CONFIG_MTK_DHCPD)
+#include <net/mtk_dhcpd.h>
+#endif
 
 /** BOOTP EXTENTIONS **/
 
@@ -447,6 +450,15 @@ restart:
 	 */
 	debug_cond(DEBUG_INT_STATE, "--- net_loop Init\n");
 	net_init_loop();
+
+#if defined(CONFIG_MTK_DHCPD)
+	/*
+	 * net_init() clears UDP handlers on first call.
+	 * For web failsafe (TCP), enable the minimal DHCP server after init.
+	 */
+	if (protocol == TCP)
+		mtk_dhcpd_start();
+#endif
 
 	switch (net_check_prereq(protocol)) {
 	case 1:

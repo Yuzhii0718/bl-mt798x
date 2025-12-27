@@ -104,7 +104,7 @@ mkdir -p "output"
 if [ -f "$ATF_DIR/build/${SOC}/release/fip.bin" ]; then
 		FIP_NAME="${SOC}_${BOARD}_${VERSION}-fip"
 		# Append '-dhcpd' for VERSION 2023 or 2024
-		if [ "$VERSION" = "2023" ] || [ "$VERSION" = "2024" ]; then
+		if [ "$VERSION" = "2022" ] || [ "$VERSION" = "2023" ] || [ "$VERSION" = "2024" ]; then
 			FIP_NAME="${FIP_NAME}-dhcpd-Yuzhii"
 		fi
 	if [ "$fixedparts" = "1" ]; then
