@@ -233,6 +233,14 @@ config MTK_HTTPD
 	help
 	  Enable mediatek httpd framework that allows some customized features.
 
+config MTK_DHCPD
+	bool "Minimal DHCP server for MediaTek web failsafe"
+	default y
+	depends on MTK_HTTPD
+	help
+	  Enable a minimal DHCPv4 server that answers DHCPDISCOVER/DHCPREQUEST
+	  while the MediaTek web failsafe UI (httpd) is running.
+
 config NET_FORCE_IPADDR
 	bool "Use ipaddr and netmask with CONFIG_IPADDR and CONFIG_NETMASK"
 	default n
