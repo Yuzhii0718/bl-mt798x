@@ -21,7 +21,7 @@ on:
       REPO_URL:
         description: 'Source repository'
         required: true
-        default: 'https://github.com/Yuzhii0718/bl-mt798x'
+        default: 'https://github.com/Yuzhii0718/bl-mt798x-dhcpd'
         type: string
       REPO_BRANCH:
         description: 'Repository branch'
@@ -39,7 +39,7 @@ on:
         default: false
         type: boolean
       OC_BL2:
-        description: 'Build 1.6GHz BL2 by patch'
+        description: 'Build 1.6GHz BL2 by patch(Only mt7981)'
         required: false
         default: false
         type: boolean
@@ -137,8 +137,8 @@ jobs:
       working-directory: /workdir
       run: |
         df -hT $PWD
-        git clone $REPO_URL -b $REPO_BRANCH bl-mt798x
-        ln -sf /workdir/bl-mt798x $GITHUB_WORKSPACE/bl-mt798x
+        git clone $REPO_URL -b $REPO_BRANCH bl-mt798x-dhcpd
+        ln -sf /workdir/bl-mt798x-dhcpd $GITHUB_WORKSPACE/bl-mt798x-dhcpd
 
     - name: SSH链接管理
       uses: P3TERX/ssh2actions@v1.0.0
@@ -159,7 +159,7 @@ jobs:
       if: github.event.inputs.GEN_BL2 == 'true' && !cancelled()
       run: |
         set -euo pipefail
-        cd bl-mt798x
+        cd bl-mt798x-dhcpd
 
         MODEL="${{ github.event.inputs.MODEL }}"
         DEFCONF="mt7981_${MODEL}_defconfig"
@@ -193,7 +193,7 @@ jobs:
     - name: 应用 BL2 超频补丁
       if: github.event.inputs.OC_BL2 == 'true' && !cancelled()
       run: |
-        cd bl-mt798x
+        cd bl-mt798x-dhcpd
         git apply modify-patch/0001-overclocking-mt7981-to-1.6GHz-by-modify-atf.patch
         echo "status=success" >> $GITHUB_OUTPUT
         echo "OC_BL2=1" >> $GITHUB_ENV
@@ -201,8 +201,9 @@ jobs:
     - name: 编译 FIP
       id: compile
       run: |
-        cd bl-mt798x
+        cd bl-mt798x-dhcpd
         chmod +x ./build.sh
+        mkdir -p output
 
         # MULTI_LAYOUT 开关
         if [ "${{ github.event.inputs.MULTI_LAYOUT }}" = "true" ]; then
@@ -224,9 +225,9 @@ jobs:
         for version in "${SUPPORTED_VERSIONS[@]}"; do
           echo "正在编译${version}版本FIP..."
           if [ "${{ github.event.inputs.MULTI_LAYOUT }}" = "true" ]; then
-            SOC=mt7981 BOARD=${{ github.event.inputs.MODEL }} VERSION=${version} MULTI_LAYOUT=1 ./build.sh
+            SOC=mt7981 BOARD=${{ github.event.inputs.MODEL }} VERSION=${version} MULTI_LAYOUT=1 ./build.sh 2>&1 | tee "output/build-${{ github.event.inputs.MODEL }}-${version}.log"
           else
-            SOC=mt7981 BOARD=${{ github.event.inputs.MODEL }} VERSION=${version} ./build.sh
+            SOC=mt7981 BOARD=${{ github.event.inputs.MODEL }} VERSION=${version} ./build.sh 2>&1 | tee "output/build-${{ github.event.inputs.MODEL }}-${version}.log"
           fi
           mkdir -p "temp_output_${version}"
           if [ -d "output" ]; then
@@ -252,7 +253,7 @@ jobs:
     - name: 编译 GPT
       if: github.event.inputs.GPT_GEN == 'true' && !cancelled()
       run: |
-        cd bl-mt798x
+        cd bl-mt798x-dhcpd
         chmod +x ./generate_gpt.sh
         ./generate_gpt.sh
         echo "status=success" >> $GITHUB_OUTPUT
@@ -266,7 +267,7 @@ jobs:
       id: organize
       if: env.UPLOAD_FIRMWARE == 'true' && !cancelled()
       run: | 
-        cd bl-mt798x
+        cd bl-mt798x-dhcpd
         # 获取当前时间戳
         TIMESTAMP=$(date +"%Y%m%d-%H%M%S")
         # 重命名 OC_BL2
@@ -302,7 +303,7 @@ jobs:
       with:
         name: ${{ env.FILE_DATE }}-${{ env.UPLOAD_TAG_NAME }}
         path: |
-          bl-mt798x/upload/*
+          bl-mt798x-dhcpd/upload/*
 
     - name: 生成固件Release标签
       id: tag
@@ -343,7 +344,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        files: bl-mt798x/upload/*
+        files: bl-mt798x-dhcpd/upload/*
         release_name: ${{ env.FILE_DATE }}-${{ env.UPLOAD_TAG_NAME }}
         name: ${{ env.FILE_DATE }}-${{ env.UPLOAD_TAG_NAME }}
         tag_name: ${{ steps.tag.outputs.release_tag }}
