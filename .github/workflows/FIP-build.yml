@@ -14,7 +14,7 @@ on:
         default: 'cmcc_a10'
         type: string
       FIP_VERSION: 
-        description: 'FIP versions (comma-separated, e.g., 2022,2023,2024,all)'
+        description: 'FIP versions (comma-separated, e.g. 2022,2023,2024,2025/all)'
         required: true
         default: '2024'
         type: string
@@ -213,7 +213,7 @@ jobs:
         
         # 解析需要编译的版本列表
         if [ "${{ github.event.inputs.FIP_VERSION }}" = "all" ]; then
-          SUPPORTED_VERSIONS=("2022" "2023" "2024")
+          SUPPORTED_VERSIONS=("2022" "2023" "2024" "2025")
           echo "检测到 all，将编译：${SUPPORTED_VERSIONS[*]}"
         else
           IFS=',' read -ra SUPPORTED_VERSIONS <<< "${{ github.event.inputs.FIP_VERSION }}"

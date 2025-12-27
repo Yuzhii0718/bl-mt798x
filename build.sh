@@ -103,8 +103,8 @@ make -C "$ATF_DIR" -f "$ATF_MKFILE" all CONFIG_CROSS_COMPILER="$TOOLCHAIN" CROSS
 mkdir -p "output"
 if [ -f "$ATF_DIR/build/${SOC}/release/fip.bin" ]; then
 		FIP_NAME="${SOC}_${BOARD}_${VERSION}-fip"
-		# Append '-dhcpd' for VERSION 2023 or 2024
-		if [ "$VERSION" = "2022" ] || [ "$VERSION" = "2023" ] || [ "$VERSION" = "2024" ]; then
+		# Append '-dhcpd' for different VERSION
+		if [ "$VERSION" = "2022" ] || [ "$VERSION" = "2023" ] || [ "$VERSION" = "2024" ] || [ "$VERSION" = "2025" ]; then
 			FIP_NAME="${FIP_NAME}-dhcpd-Yuzhii"
 		fi
 	if [ "$fixedparts" = "1" ]; then
