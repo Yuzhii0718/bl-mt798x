@@ -1,16 +1,23 @@
 <!DOCTYPE HTML>
-<html>
-	<head>
-		<meta charset="utf-8">
-		<title>Update failed</title>
-		<link rel="stylesheet" href="/style.css">
-		<script src="/index.js"></script>
-	</head>
-	<body onload="getversion()">
-		<div id="m">
-			<h1 class="red">UPDATE FAILED</h1>
-			<div class="i e"><strong>Something went wrong during update</strong>Probably you have chosen wrong file. Please, try again or contact with the author of this modification. You can also get more information during update in U-Boot console.</div>
+<html data-title-key="page.fail.title">
+
+<head>
+	<meta charset="utf-8">
+	<title>Update failed</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<link rel="stylesheet" href="/style.css">
+	<script src="/index.js"></script>
+</head>
+
+<body onload="initPage()">
+	<div id="m">
+		<h1 class="red" data-i18n="page.fail.h1">Update failed</h1>
+		<div class="note error">
+			<strong data-i18n="page.fail.msgStrong">Something went wrong during update</strong>
+			<span class="muted" data-i18n="page.fail.msg"></span>
 		</div>
-		<div id="version"></div>
-	</body>
+	</div>
+	<div id="version"></div>
+</body>
+
 </html>
