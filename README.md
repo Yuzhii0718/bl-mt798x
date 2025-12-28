@@ -16,6 +16,10 @@ Support Actions to build automatically, generate normal/overclocking BL2.
 
 ![Version-2023/2024](document/uboot-2023.png)
 
+> Version-2025 WEBUI preview
+
+![Version-2025](document/uboot-2025.png)
+
 ## Prepare
 
 ```bash

@@ -1,41 +1,53 @@
 <!DOCTYPE HTML>
 <html>
-	<head>
-		<meta charset="utf-8">
-		<title>BL2 update</title>
-		<link rel="stylesheet" href="/style.css">
-		<script src="/main.js"></script>
-	</head>
-	<body onload="getversion()">
-		<div id="m">
-			<h1>BL2 UPDATE</h1>
-			<p id="hint">
-				You are going to update <strong>BL2 (preloader)</strong> on the device.<br>
-				Please, choose file from your local hard drive and click <strong>Upload</strong> button.
-			</p>
-			<form id="form">
-				<input id="file" type="file" name="bl2">
-				<input type="button" value="Upload" onclick="upload('bl2')">
-			</form>
-			<div>
-				<div class="bar" id="bar" style="display: none; --percent: 0;"></div>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>BL2 update</title>
+	<link rel="stylesheet" href="/style.css">
+	<script src="/main.js"></script>
+</head>
+
+<body onload="appInit('bl2')" data-page="bl2">
+	<div class="app">
+		<aside id="sidebar" class="sidebar"></aside>
+		<div class="main">
+			<div id="m">
+				<h1 data-i18n="bl2.title">BL2 UPDATE</h1>
+				<p id="hint" data-i18n-html="bl2.hint">
+					You are going to update <strong>BL2 (preloader)</strong> on the device.<br>
+					Please, choose file from your local hard drive and click <strong>Upload</strong> button.
+				</p>
+				<form id="form">
+					<input id="file" type="file" name="bl2">
+					<input type="button" value="Upload" data-i18n-attr="value:common.upload" onclick="upload('bl2')">
+				</form>
+				<div>
+					<div class="bar" id="bar" style="display: none; --percent: 0;"></div>
+				</div>
+				<div id="size" style="display: none;">Size: xxxx</div>
+				<div id="md5" style="display: none;">MD5: xxxx</div>
+				<div id="upgrade" style="display: none;">
+					<p data-i18n="bl2.upgrade_hint">If all information above is correct, click "Update".</p>
+					<button class="button" data-i18n="common.update"
+						onclick="location = '/flashing.html'">Update</button>
+				</div>
+				<div class="i w">
+					<strong data-i18n="common.warnings">WARNINGS</strong>
+					<ul>
+						<li data-i18n="bl2.warn.1">do not power off the device during update</li>
+						<li data-i18n="bl2.warn.2">if everything goes well, the device will restart</li>
+						<li data-i18n="bl2.warn.3">you can upload whatever you want, so be sure that you choose proper
+							BL2 image for your device</li>
+						<li data-i18n="bl2.warn.4">updating BL2 is a very dangerous operation and may damage your
+							device!</li>
+					</ul>
+				</div>
 			</div>
-			<div id="size" style="display: none;">Size: xxxx</div>
-			<div id="md5" style="display: none;">MD5: xxxx</div>
-			<div id="upgrade" style="display: none;">
-				<p>If all information above is correct, click "Update".</p>
-				<button class="button" onclick="location = '/flashing.html'">Update</button>
-			</div>
-			<div class="i w">
-				<strong>WARNINGS</strong>
-				<ul>
-					<li>do not power off the device during update</li>
-					<li>if everything goes well, the device will restart</li>
-					<li>you can upload whatever you want, so be sure that you choose proper BL2 image for your device</li>
-					<li>updating BL2 is a very dangerous operation and may damage your device!</li>
-				</ul>
-			</div>
+			<div id="version"></div>
 		</div>
-        <div id="version"></div>
-	</body>
+	</div>
+</body>
+
 </html>

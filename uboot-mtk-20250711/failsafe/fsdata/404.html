@@ -1,18 +1,27 @@
 <!DOCTYPE HTML>
 <html>
-	<head>
-		<meta charset="utf-8">
-		<meta http-equiv="Cache-Control" content="no-cache" />
-		<meta http-equiv="refresh" content="2; URL=/" />
-		<title>Page not found</title>
-		<link rel="stylesheet" href="/style.css">
-		<script src="/main.js"></script>
-	</head>
-	<body onload="getversion()">
-		<div id="m">
-			<h1 class="red">PAGE NOT FOUND</h1>
-			<div class="i e">The page you were looking for doesn't exist!</div>
+
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="Cache-Control" content="no-cache" />
+	<meta http-equiv="refresh" content="2; URL=/" />
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Page not found</title>
+	<link rel="stylesheet" href="/style.css">
+	<script src="/main.js"></script>
+</head>
+
+<body onload="appInit('404')" data-page="404">
+	<div class="app">
+		<aside id="sidebar" class="sidebar"></aside>
+		<div class="main">
+			<div id="m">
+				<h1 class="red" data-i18n="404.title">PAGE NOT FOUND</h1>
+				<div class="i e" data-i18n="404.msg">The page you were looking for doesn't exist!</div>
+			</div>
+			<div id="version"></div>
 		</div>
-		<div id="version"></div>
-	</body>
+	</div>
+</body>
+
 </html>
