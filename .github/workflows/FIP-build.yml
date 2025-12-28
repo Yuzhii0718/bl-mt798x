@@ -48,6 +48,11 @@ on:
         required: false
         default: false
         type: boolean
+      CUSTOM_IP:
+        description: 'Custom default IP for DHCPD (e.g. 192.168.31.1)'
+        required: false
+        default: 'false'
+        type: string
       ssh:
         description: 'SSH connection to Actions'
         required: false
@@ -154,6 +159,57 @@ jobs:
         for version in "${VERSIONS[@]}"; do
           echo "Processing version: $version"
         done
+
+    - name: 应用特殊网段到 U-Boot DHCPD
+      if: github.event.inputs.CUSTOM_IP != 'false' && !cancelled()
+      shell: bash
+      run: |
+        set -euo pipefail
+        cd bl-mt798x-dhcpd
+
+        CUSTOM_IP="${{ github.event.inputs.CUSTOM_IP }}"
+        if [ "$CUSTOM_IP" = "false" ] || [ -z "$CUSTOM_IP" ]; then
+          echo "未启用特殊网段（CUSTOM_IP=false 或未提供）"
+          exit 0
+        fi
+
+        # 简单 IPv4 校验（不校验每段的取值范围）
+        if ! echo "$CUSTOM_IP" | grep -Eq '^[0-9]{1,3}(\.[0-9]{1,3}){3}$'; then
+          echo "非法的 CUSTOM_IP: $CUSTOM_IP"
+          exit 1
+        fi
+
+        PREFIX="$(echo "$CUSTOM_IP" | awk -F. '{print $1"."$2"."$3}')"
+        POOL_START="${PREFIX}.100"
+        POOL_END="${PREFIX}.200"
+
+        echo "将替换 DHCP 默认参数："
+        echo "  DHCPD_DEFAULT_IP_STR      = $CUSTOM_IP"
+        echo "  DHCPD_POOL_START_STR      = $POOL_START"
+        echo "  DHCPD_POOL_END_STR        = $POOL_END"
+
+        count=0
+        for f in uboot-mtk-*/net/mtk_dhcpd.c; do
+          if [ -f "$f" ]; then
+            sed -i -E \
+              -e 's/^(#define[[:space:]]+DHCPD_DEFAULT_IP_STR[[:space:]]+")([^"]+)(")/\1'"$CUSTOM_IP"'\3/' \
+              -e 's/^(#define[[:space:]]+DHCPD_POOL_START_STR[[:space:]]+")([^"]+)(")/\1'"$POOL_START"'\3/' \
+              -e 's/^(#define[[:space:]]+DHCPD_POOL_END_STR[[:space:]]+")([^"]+)(")/\1'"$POOL_END"'\3/' \
+              "$f"
+            echo "Patched: $f"
+            count=$((count+1))
+          fi
+        done
+
+        if [ "$count" -eq 0 ]; then
+          echo "Warning: 未找到 uboot-mtk-*/net/mtk_dhcpd.c 文件，跳过替换"
+        fi
+
+        echo "CUSTOM_NET=1" >> $GITHUB_ENV
+        echo "CUSTOM_NET_IP=${CUSTOM_IP}" >> $GITHUB_ENV
+        echo "CUSTOM_NET_POOL_START=${POOL_START}" >> $GITHUB_ENV
+        echo "CUSTOM_NET_POOL_END=${POOL_END}" >> $GITHUB_ENV
+        echo "status=success" >> $GITHUB_OUTPUT
 
     - name: ATF22/23 BL2 生成配置修正
       if: github.event.inputs.GEN_BL2 == 'true' && !cancelled()
@@ -278,6 +334,17 @@ jobs:
             fi
           done
         fi
+        # 标注特殊网段（先追加 _customnet 后缀，再追加时间戳）
+        if [ "${{ env.CUSTOM_NET }}" = "1" ]; then
+          for dir in output output_gpt; do
+            if [ -d "$dir" ]; then
+              for file in "$dir"/*; do
+                [ -f "$file" ] || continue
+                mv "$file" "${file%.*}_customnet.${file##*.}"
+              done
+            fi
+          done
+        fi
         # 重命名 output 目录下的文件
         if [ -d "output" ]; then
           rename "s/(.*)\.(.*)/\$1_${TIMESTAMP}.\$2/" output/*
@@ -328,6 +395,20 @@ jobs:
           echo "- 已应用1.6GHz BL2超频补丁" >> release.txt
         else
           echo "- 未应用1.6GHz BL2超频补丁" >> release.txt
+        fi
+        CUSTOM_IP="${{ github.event.inputs.CUSTOM_IP }}"
+        if [ "$CUSTOM_IP" != "false" ] && [ -n "$CUSTOM_IP" ]; then
+          if echo "$CUSTOM_IP" | grep -Eq '^[0-9]{1,3}(\.[0-9]{1,3}){3}$'; then
+            PREFIX="$(echo "$CUSTOM_IP" | awk -F. '{print $1"."$2"."$3}')"
+            POOL_START="${PREFIX}.100"
+            POOL_END="${PREFIX}.200"
+            echo "- 已应用特殊网段：$CUSTOM_IP" >> release.txt
+            echo "  - 地址池范围：$POOL_START - $POOL_END" >> release.txt
+          else
+            echo "- 特殊网段输入无效（CUSTOM_IP=$CUSTOM_IP），已保持默认网段192.168.1.1" >> release.txt
+          fi
+        else
+          echo "- 保持默认网段192.168.1.1" >> release.txt
         fi
         if [ "${{ github.event.inputs.GPT_GEN }}" = "true" ]; then
           echo "- 已生成GPT分区表镜像" >> release.txt

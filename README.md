@@ -65,7 +65,9 @@ Generate file will be in `output_gpt`
 - [ ] Build BL2 (Normal)
 - [ ] Build BL2 (Overclocking)
 - [ ] Multi-layout support (Only for multi-layout devices)
+- [ ] Special subnet support (Custom default IP for DHCPD)
 
+> Although you can customize the dhcpd subnet, but the mask is fixed to "255.255.255.0", so you must ensure your device is in this subnet.
 
 ## FIT support
 
