@@ -3,6 +3,11 @@ name: Build FIT BL2 and FIP
 on:
   workflow_dispatch:
     inputs:
+      TARGET:
+        description: 'Build target (format: soc,board). Default: all. e.g. mt7981,cmcc_a10'
+        required: true
+        default: 'all'
+        type: string
       OC_BL2:
         description: 'Build 1.6GHz BL2 by patch'
         required: false
@@ -47,20 +52,56 @@ jobs:
 
           # Extract defconfig filenames touched by the patch (unique, basename only).
           # Expected diff line format: diff --git a/<path> b/<path>
-          CONFIGS="$(
+          CONFIG_LIST="$(
             awk '/^diff --git a\// {print $4}' "$PATCH_FILE" \
               | sed 's/^b\///' \
               | awk -F '/' '/defconfig$/ {print $NF}' \
-              | sort -u \
-              | awk '{printf "\"%s\",", $0}' \
-              | sed 's/,$//'
+              | sort -u
           )"
 
-          if [ -z "$CONFIGS" ]; then
+          if [ -z "$CONFIG_LIST" ]; then
             echo "No *defconfig entries found in patch: $PATCH_FILE" >&2
             exit 1
           fi
 
+          # Optional: build only one target when inputs.TARGET is provided as soc,board
+          TARGET_RAW="${{ github.event.inputs.TARGET }}"
+          TARGET_RAW="${TARGET_RAW:-all}"
+          # Trim all whitespace so both "mt7981,cmcc_a10" and "mt7981, cmcc_a10" work.
+          TARGET="$(echo "$TARGET_RAW" | tr -d '[:space:]')"
+
+          if [ -n "$TARGET" ] && [ "$TARGET" != "all" ]; then
+            # format: soc,board -> soc_board_defconfig
+            if ! echo "$TARGET" | grep -Eq '^[A-Za-z0-9._-]+,[A-Za-z0-9._-]+$'; then
+              echo "Illegal TARGET: '$TARGET_RAW' (expected: soc,board). e.g. mt7981,cmcc_a10" >&2
+              exit 1
+            fi
+
+            SOC="${TARGET%%,*}"
+            BOARD="${TARGET#*,}"
+            DEFCONFIG="${SOC}_${BOARD}_defconfig"
+
+            # Prefer validating against patch-derived list; otherwise validate existence in tree.
+            if echo "$CONFIG_LIST" | grep -Fxq "$DEFCONFIG"; then
+              echo "TARGET matched patch list: $DEFCONFIG"
+            else
+              if ! find uboot-mtk-* -path "*/configs/${DEFCONFIG}" -type f -print -quit | grep -q .; then
+                echo "TARGET defconfig not found: $DEFCONFIG" >&2
+                echo "Available defconfigs from patch list:" >&2
+                echo "$CONFIG_LIST" | sed 's/^/  - /' >&2
+                exit 1
+              fi
+              echo "TARGET found in tree (not in patch list): $DEFCONFIG"
+            fi
+
+            JSON_LIST="{\"runner\": [\"ubuntu-latest\"],\"list\": [\"${DEFCONFIG}\"]}"
+            echo "$JSON_LIST" | jq .
+            echo "list=$JSON_LIST" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # Default: build all defconfigs extracted from patch.
+          CONFIGS="$(echo "$CONFIG_LIST" | awk '{printf "\"%s\",", $0}' | sed 's/,$//')"
           JSON_LIST="{\"runner\": [\"ubuntu-latest\"],\"list\": [$CONFIGS]}"
           echo "$JSON_LIST" | jq .
           echo "list=$JSON_LIST" >> "$GITHUB_OUTPUT"
