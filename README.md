@@ -10,15 +10,15 @@ Support Actions to build automatically, generate normal/overclocking BL2.
 
 > Version-2022 WEBUI preview
 
-![Version-2022](document/uboot-2022.png)
+![Version-2022](document/pictures/uboot-2022.png)
 
 > Version-2023/2024 WEBUI preview
 
-![Version-2023/2024](document/uboot-2023.png)
+![Version-2023/2024](document/pictures/uboot-2023.png)
 
 > Version-2025 WEBUI preview
 
-![Version-2025](document/uboot-2025.png)
+![Version-2025](document/pictures/uboot-2025.png)
 
 ## Prepare
 
