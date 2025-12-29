@@ -258,6 +258,8 @@ jobs:
           set -euo pipefail
           touch release.txt
 
+          echo "- 构建目标（TARGET）：${{ github.event.inputs.TARGET }}" >> release.txt
+
           CUSTOM_IP="${{ github.event.inputs.CUSTOM_IP }}"
           if [ "$CUSTOM_IP" != "false" ] && [ -n "$CUSTOM_IP" ]; then
             if echo "$CUSTOM_IP" | grep -Eq '^[0-9]{1,3}(\.[0-9]{1,3}){3}$'; then
@@ -279,9 +281,11 @@ jobs:
             echo "- 未应用1.6GHz BL2超频补丁" >> release.txt
           fi
 
+          echo "FIT 代码来自[bl-mt798x-oss](https://github.com/1715173329/bl-mt798x-oss/tree/fit-example)，感谢原作者的贡献。" >> release.txt
+
           echo "TIMESTAMP=${{ needs.generate_list.outputs.timestamp }}" >> "$GITHUB_ENV"
-          echo "RELEASE_TAG=dhcp-Yuzhii-FIT-${{ needs.generate_list.outputs.timestamp }}" >> "$GITHUB_ENV"
-          echo "RELEASE_NAME=dhcp-Yuzhii-FIT-${{ needs.generate_list.outputs.timestamp }}" >> "$GITHUB_ENV"
+          echo "RELEASE_TAG=FIT-dhcpd-${{ needs.generate_list.outputs.timestamp }}" >> "$GITHUB_ENV"
+          echo "RELEASE_NAME=FIT-dhcpd-${{ needs.generate_list.outputs.timestamp }}" >> "$GITHUB_ENV"
 
       - name: Publish firmware to Release
         uses: softprops/action-gh-release@v2
