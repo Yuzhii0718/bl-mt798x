@@ -141,7 +141,7 @@ done:
 
 static int env_mtd_load(void)
 {
-	struct mtd_info *mtd_env;
+	struct mtd_info *mtd_env = NULL;
 	char *buf, *tmp;
 	size_t ret_len;
 	int remaining;
@@ -190,7 +190,8 @@ static int env_mtd_load(void)
 		gd->env_valid = ENV_VALID;
 
 out:
-	put_mtd_device(mtd_env);
+	if (mtd_env)
+		put_mtd_device(mtd_env);
 
 	free(buf);
 
