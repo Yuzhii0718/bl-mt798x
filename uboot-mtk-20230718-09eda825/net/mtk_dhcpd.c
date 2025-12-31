@@ -20,6 +20,12 @@
 #define DHCPD_SERVER_PORT	67
 #define DHCPD_CLIENT_PORT	68
 
+/*
+ * BOOTP/DHCP has a historical minimum message size of 300 bytes.
+ * Some clients (notably Windows) may ignore shorter replies.
+ */
+#define DHCPD_MIN_BOOTP_LEN	300
+
 /* BOOTP/DHCP message header (RFC 2131) */
 struct dhcpd_pkt {
 	u8 op;
@@ -364,6 +370,8 @@ static int dhcpd_send_reply(const struct dhcpd_pkt *req, unsigned int req_len,
 	*opt++ = DHCP_OPTION_END;
 
 	payload_len = (int)((uintptr_t)opt - (uintptr_t)payload);
+	if (payload_len < DHCPD_MIN_BOOTP_LEN)
+		payload_len = DHCPD_MIN_BOOTP_LEN;
 
 	/* Update UDP header with actual payload length */
 	net_set_udp_header(pkt + eth_hdr_size, bcast,
