@@ -2,6 +2,7 @@
 *.sym
 *.map
 *.cmd
+*.so
 *.su
 *.dtb
 *.tmp
@@ -31,3 +32,12 @@ u-boot.cfg
 /mkgpt/gpttable
 __pycache__
 output/*
+*.mkimage
+
+# Toolchain
+openwrt*/
+openwrt-toolchain*
+
+# Build tree
+/build-*
+archive/
