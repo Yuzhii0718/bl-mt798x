@@ -1,39 +1,45 @@
 <!DOCTYPE HTML>
 <html>
-	<head>
-		<meta charset="utf-8">
-		<title>Update in progress</title>
-		<link rel="stylesheet" href="/style.css">
-		<script src="/main.js"></script>
-		<script>
-			function init() {
-				getversion();
 
-				ajax({
-					url: '/result',
-					done: function(response) {
-						if (response == 'failed') {
-							location = '/fail.html'
-							return
-						}
+<head>
+	<meta charset="utf-8">
+	<title>Update in progress</title>
+	<link rel="stylesheet" href="/style.css">
+	<script src="/main.js"></script>
+	<script>
+		function init() {
+			getversion();
 
-						document.getElementById('title').innerHTML = 'UPDATE COMPLETED'
-						document.getElementById('info').innerHTML = 'Your device was successfully updated! Now rebooting...'
-					},
-					timeout: 1800000
-				})
-			}
-		</script>
-	</head>
-	<body onload="init()">
-		<div id="m">
-			<h1 id="title">UPDATE IN PROGRESS</h1>
-			<p id="info">
-				Your file was successfully uploaded! Update is in progress and you should wait for automatic reset of the device.<br>
+			ajax({
+				url: '/result',
+				done: function (response) {
+					if (response == 'failed') {
+						location = '/fail.html'
+						return
+					}
+
+					document.getElementById('title').innerHTML = t('title_update_completed')
+					document.getElementById('info').innerHTML = t('update_success_info')
+				},
+				timeout: 1800000
+			})
+		}
+	</script>
+</head>
+
+<body onload="init()">
+	<div class="layout">
+		<main class="content">
+			<h1 id="title" data-i18n="title_update_in_progress">UPDATE IN PROGRESS</h1>
+			<p id="info" data-i18n="update_uploading_info">
+				Your file was successfully uploaded! Update is in progress and you should wait for automatic reset of
+				the device.<br>
 				Update time depends on image size and may take up to a few minutes.
 			</p>
 			<div id="l"></div>
-		</div>
-        <div id="version"></div>
-	</body>
+			<div id="version" class="muted"></div>
+		</main>
+	</div>
+</body>
+
 </html>
