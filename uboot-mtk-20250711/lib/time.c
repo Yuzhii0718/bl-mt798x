@@ -67,7 +67,7 @@ extern unsigned long timer_read_counter(void);
 #endif
 
 #if CONFIG_IS_ENABLED(TIMER)
-ulong notrace get_tbclk(void)
+ulong __weak notrace get_tbclk(void)
 {
 	if (!gd->timer) {
 		int ret;

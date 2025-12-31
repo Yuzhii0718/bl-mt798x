@@ -131,6 +131,9 @@
 #if defined(CONFIG_MTK_TCP)
 #include "mtk_tcp.h"
 #endif
+#if defined(CONFIG_MTK_DHCPD)
+#include <net/mtk_dhcpd.h>
+#endif
 
 /** BOOTP EXTENTIONS **/
 
@@ -498,6 +501,15 @@ restart:
 	 */
 	debug_cond(DEBUG_INT_STATE, "--- net_loop Init\n");
 	net_init_loop();
+
+#if defined(CONFIG_MTK_DHCPD)
+	/*
+	 * net_init() clears UDP handlers on first call.
+	 * For web failsafe (MTK_TCP), enable the minimal DHCP server after init.
+	 */
+	if (protocol == MTK_TCP)
+		mtk_dhcpd_start();
+#endif
 
 	if (!test_eth_enabled())
 		return 0;
@@ -1427,7 +1439,8 @@ void net_process_received_packet(uchar *in_packet, int len)
 		if (ip->ip_p == IPPROTO_ICMP) {
 			receive_icmp(ip, len, src_ip, et);
 			return;
-#if defined(CONFIG_PROT_TCP)
+
+#if defined(CONFIG_PROT_TCP) || defined(CONFIG_MTK_TCP)
 		} else if (ip->ip_p == IPPROTO_TCP) {
 			debug_cond(DEBUG_DEV_PKT,
 				   "TCP PH (to=%pI4, from=%pI4, len=%d)\n",
@@ -1435,9 +1448,13 @@ void net_process_received_packet(uchar *in_packet, int len)
 
 #if defined(CONFIG_MTK_TCP)
 			bool rc = mtk_receive_tcp((struct ip_hdr *)ip, len, et);
-			if (!rc)
+			if (rc)
+				return;
 #endif
+
+#if defined(CONFIG_PROT_TCP)
 			rxhand_tcp_f((union tcp_build_pkt *)ip, len);
+#endif
 			return;
 #endif
 		} else if (ip->ip_p != IPPROTO_UDP) {	/* Only UDP packets */
