@@ -60,7 +60,7 @@ chmod +x generate_gpt.sh
 
 Generate file will be in `output_gpt`
 
-> You need add your device's partition info json file in "atf-20231013-0ea67d76a/tools/dev/gpt_editor/mt798x", like e.g. "philips-hy3000_128G_rootfs1024M_production1024M-gpt.json"
+> You need add your device's partition info json file in "atf-20231013-0ea67d76a/tools/dev/gpt_editor/mt798x", like e.g. "atf-dir/tools/dev/gpt_editor/example/gpt.json"
 
 ## Use Action to build
 
